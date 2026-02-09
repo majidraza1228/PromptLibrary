@@ -819,7 +819,15 @@ let currentFilter = 'all';
 function init() {
   const stored = localStorage.getItem('prompt-library-v1');
   if (stored) {
-    try { prompts = JSON.parse(stored); } catch(e) { prompts = [...seedPrompts]; }
+    try {
+      prompts = JSON.parse(stored);
+      // Merge in any new seed prompts not yet in localStorage
+      const existingNames = new Set(prompts.map(p => p.name));
+      seedPrompts.forEach(sp => {
+        if (!existingNames.has(sp.name)) prompts.push(sp);
+      });
+      save();
+    } catch(e) { prompts = [...seedPrompts]; }
   } else {
     prompts = [...seedPrompts];
   }
