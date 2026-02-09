@@ -1,6 +1,6 @@
 # Prompt Library
 
-A personal, browser-based library for storing, organizing, and reusing AI prompts. Built as a single HTML file with no dependencies — just open and use.
+A personal, browser-based library for storing, organizing, and reusing AI prompts. Built with plain HTML/CSS/JS — no frameworks, no build tools.
 
 **Live Site:** [majidraza1228.github.io/PromptLibrary](https://majidraza1228.github.io/PromptLibrary/)
 
@@ -72,8 +72,8 @@ Prompt Library gives you a searchable, categorized collection of reusable prompt
 ### Option 1: Edit Prompts in the Browser (No Code)
 Any prompts you add, edit, or delete through the UI are saved in your browser's localStorage. They persist across page refreshes but are tied to that specific browser/device.
 
-### Option 2: Edit the Source Code
-To permanently change the built-in prompts (the ones everyone sees):
+### Option 2: Edit `prompts.js` (Recommended)
+All built-in prompts live in a separate **`prompts.js`** file, so you never need to touch `index.html`.
 
 1. **Clone the repo:**
    ```bash
@@ -81,38 +81,44 @@ To permanently change the built-in prompts (the ones everyone sees):
    cd PromptLibrary
    ```
 
-2. **Open `index.html`** in any text editor
+2. **Open `prompts.js`** in any text editor — this is the only file you need to edit
 
-3. **Find the `seedPrompts` array** (around line 813) — this is where all built-in prompts live
-
-4. **Add a new prompt** by copying this template and adding it to the array:
+3. **Add a new prompt** by copying the template at the top of the file and pasting it at the end of the array (before the closing `];`):
    ```javascript
    {
      name: "Your Prompt Name",
-     category: "writing",  // "writing", "coding", or "meta"
+     category: "writing",       // "writing" | "coding" | "meta"
      description: "A short description of what this prompt does.",
      prompt: `Your full prompt text here.
 
    Use [VARIABLE_NAME] for placeholders that users should fill in.`,
      tags: ["tag1", "tag2", "tag3"],
-     model: "Claude",  // "Claude", "GPT-4o", "Gemini", or "Any"
-     rating: 8,
+     model: "Claude",           // "Claude" | "GPT-4o" | "Gemini" | "Any"
+     rating: 8,                 // 1-10
      version: "1.0",
      favorite: false,
      notes: "Optional tips on when or how to use this prompt.",
      uses: 0,
-     created: "2025-02-08"
+     created: "2025-02-08"      // YYYY-MM-DD
    }
    ```
 
-5. **Commit and push:**
+4. **Commit and push:**
    ```bash
-   git add index.html
+   git add prompts.js
    git commit -m "Add new prompt: Your Prompt Name"
    git push origin main
    ```
 
-6. GitHub Pages will automatically rebuild — your changes go live in 1-2 minutes.
+5. GitHub Pages will automatically rebuild — your changes go live in 1-2 minutes.
+
+### Project Structure
+```
+PromptLibrary/
+├── index.html      ← App layout, styles, and logic (rarely needs editing)
+├── prompts.js      ← All prompt data lives here (edit this to add/remove prompts)
+└── README.md       ← This file
+```
 
 ### Option 3: Add a New Category
 To add a category beyond Writing, Coding, and Meta:
