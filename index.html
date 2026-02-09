@@ -1,745 +1,1818 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Library</title>
-    <style>
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Prompt Library</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface-2: #222222;
+    --surface-3: #2a2a2a;
+    --border: #333;
+    --border-hover: #444;
+    --text: #e8e8e8;
+    --text-muted: #888;
+    --text-dim: #555;
+    --accent-writing: #f0a050;
+    --accent-writing-bg: rgba(240,160,80,0.08);
+    --accent-coding: #50c8f0;
+    --accent-coding-bg: rgba(80,200,240,0.08);
+    --accent-meta: #b080f0;
+    --accent-meta-bg: rgba(176,128,240,0.08);
+    --green: #50d080;
+    --red: #f06060;
+    --yellow: #f0d050;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
 
-        :root {
-            --bg-primary: #0f1117;
-            --bg-secondary: #1a1d27;
-            --bg-card: #22253a;
-            --bg-card-hover: #2a2e45;
-            --text-primary: #e8eaf0;
-            --text-secondary: #9ba1b0;
-            --accent: #6c63ff;
-            --accent-hover: #5a52e0;
-            --border: #2e3348;
-            --badge-coding: #3b82f6;
-            --badge-blog: #f59e0b;
-            --badge-content: #10b981;
-            --copy-success: #22c55e;
-            --radius: 12px;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-        }
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-        }
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
 
-        /* Hero */
-        .hero {
-            text-align: center;
-            padding: 3.5rem 1.5rem 2rem;
-            background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 100%);
-            border-bottom: 1px solid var(--border);
-        }
+  /* ── Sidebar ── */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
 
-        .hero h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #6c63ff, #48bfe3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    z-index: 10;
+  }
 
-        .hero p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            max-width: 520px;
-            margin: 0 auto;
-        }
+  .sidebar-logo {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
 
-        /* Controls */
-        .controls {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem 1.5rem 0;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+  .sidebar-title {
+    font-family: 'Source Serif 4', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
 
-        .search-wrapper {
-            position: relative;
-            width: 100%;
-        }
+  .sidebar-section {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    margin-top: 24px;
+  }
 
-        .search-wrapper svg {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            color: var(--text-secondary);
-            pointer-events: none;
-        }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
 
-        #search {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.75rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-primary);
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+  .sidebar-item:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
 
-        #search::placeholder {
-            color: var(--text-secondary);
-        }
+  .sidebar-item.active {
+    background: var(--surface-3);
+    color: var(--text);
+    font-weight: 500;
+  }
 
-        #search:focus {
-            border-color: var(--accent);
-        }
+  .sidebar-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-item .count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
 
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
+  .dot-writing { color: var(--accent-writing); }
+  .dot-coding { color: var(--accent-coding); }
+  .dot-meta { color: var(--accent-meta); }
 
-        .tab {
-            padding: 0.5rem 1.15rem;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
+  /* ── Main ── */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    padding: 36px 48px;
+    max-width: 1100px;
+  }
 
-        .tab:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
+  /* ── Header ── */
+  .page-header {
+    margin-bottom: 32px;
+  }
 
-        .tab.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #fff;
-        }
+  .page-header h1 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 32px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
 
-        /* Grid */
-        .grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 1.25rem;
-        }
+  .page-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
 
-        /* Card */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
+  /* ── Search & Controls ── */
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
-            border-color: var(--accent);
-        }
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
 
-        .card-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.75rem;
-        }
+  .search-box input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px 10px 38px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-        .card-title {
-            font-size: 1.05rem;
-            font-weight: 600;
-        }
+  .search-box input:focus { border-color: var(--text-dim); }
+  .search-box input::placeholder { color: var(--text-dim); }
 
-        .badge {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.25rem 0.65rem;
-            border-radius: 999px;
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            flex-shrink: 0;
-        }
+  .search-box::before {
+    content: '\2315';
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 16px;
+  }
 
-        .badge-coding {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--badge-coding);
-        }
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
 
-        .badge-blog {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--badge-blog);
-        }
+  .filter-btn:hover { border-color: var(--border-hover); color: var(--text); }
+  .filter-btn.active { border-color: var(--accent-writing); color: var(--accent-writing); background: var(--accent-writing-bg); }
+  .filter-btn.active-code { border-color: var(--accent-coding); color: var(--accent-coding); background: var(--accent-coding-bg); }
+  .filter-btn.active-meta { border-color: var(--accent-meta); color: var(--accent-meta); background: var(--accent-meta-bg); }
 
-        .badge-content {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--badge-content);
-        }
+  .add-btn {
+    background: var(--surface-3);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-        .card-prompt {
-            color: var(--text-secondary);
-            font-size: 0.88rem;
-            line-height: 1.65;
-            flex: 1;
-            white-space: pre-wrap;
-        }
+  .add-btn:hover { border-color: var(--green); color: var(--green); }
 
-        .card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 0.25rem;
-        }
+  /* ── Stats Bar ── */
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
 
-        .tags {
-            display: flex;
-            gap: 0.35rem;
-            flex-wrap: wrap;
-        }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-        .tag {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.15rem 0.5rem;
-            border-radius: 4px;
-        }
+  .stat-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+  }
 
-        .copy-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            padding: 0.4rem 0.85rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
 
-        .copy-btn:hover {
-            border-color: var(--accent);
-            color: var(--text-primary);
-        }
+  /* ── Prompt Cards ── */
+  .prompts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
 
-        .copy-btn.copied {
-            border-color: var(--copy-success);
-            color: var(--copy-success);
-        }
+  .prompt-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
 
-        .copy-btn svg {
-            width: 14px;
-            height: 14px;
-        }
+  .prompt-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
 
-        /* Empty state */
-        .empty {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-secondary);
-        }
+  .prompt-card.cat-writing::before { background: var(--accent-writing); }
+  .prompt-card.cat-coding::before { background: var(--accent-coding); }
+  .prompt-card.cat-meta::before { background: var(--accent-meta); }
 
-        .empty p {
-            font-size: 1.1rem;
-        }
+  .prompt-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
 
-        /* Prompt count */
-        .count {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
+  .prompt-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-        }
+  .prompt-card-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+  .prompt-card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+  }
 
-        .card {
-            animation: fadeIn 0.3s ease both;
-        }
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 1.8rem;
-            }
+  .tag-writing { background: var(--accent-writing-bg); color: var(--accent-writing); }
+  .tag-coding { background: var(--accent-coding-bg); color: var(--accent-coding); }
+  .tag-meta { background: var(--accent-meta-bg); color: var(--accent-meta); }
 
-            .hero p {
-                font-size: 0.95rem;
-            }
+  .rating {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--yellow);
+  }
 
-            .grid {
-                grid-template-columns: 1fr;
-                padding: 1rem;
-            }
+  .prompt-card-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
 
-            .controls {
-                padding: 1rem 1rem 0;
-            }
+  .prompt-card-footer {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
 
-            .count {
-                padding: 0 1rem;
-            }
-        }
-    </style>
+  .prompt-card-footer span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .fav-star {
+    cursor: pointer;
+    font-size: 14px;
+    transition: transform 0.2s;
+    user-select: none;
+  }
+
+  .fav-star:hover { transform: scale(1.3); }
+  .fav-star.active { color: var(--yellow); }
+
+  /* ── Expanded prompt ── */
+  .prompt-expanded {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .prompt-expanded.show { display: block; }
+
+  .prompt-text {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .prompt-text .var {
+    color: var(--accent-writing);
+    background: var(--accent-writing-bg);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--green); border-color: var(--green); }
+
+  .example-output {
+    margin-top: 12px;
+  }
+
+  .example-output summary {
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .example-output-content {
+    margin-top: 8px;
+    padding: 14px;
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .prompt-notes {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 560px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .form-group textarea {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--text-dim);
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .form-row .form-group { flex: 1; }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { color: var(--text); }
+
+  .btn-primary {
+    background: var(--green);
+    color: var(--bg);
+    border-color: var(--green);
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+
+  /* ── Best Practices Panel ── */
+  .best-practices {
+    margin-top: 40px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .best-practices h2 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .bp-card {
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .bp-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bp-card p {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── Mobile Menu Toggle ── */
+  .mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 20;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .mobile-menu-btn { display: block; }
+    .main { margin-left: 0; padding: 60px 20px 20px; }
+    .bp-grid { grid-template-columns: 1fr; }
+    .form-row { flex-direction: column; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
 </head>
 <body>
 
-<section class="hero">
-    <h1>Prompt Library</h1>
-    <p>A curated collection of reusable prompts for coding, blog writing, and content creation.</p>
-</section>
+<button class="mobile-menu-btn" onclick="toggleSidebar()">&#9776;</button>
 
-<div class="controls">
-    <div class="search-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
-        </svg>
-        <input type="text" id="search" placeholder="Search prompts..." autocomplete="off">
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">&#128218; Personal</div>
+    <div class="sidebar-title">Prompt Library</div>
+
+    <div class="sidebar-section">Views</div>
+    <div class="sidebar-item active" onclick="filterCategory('all', this)">
+      <span class="icon">&#9643;</span> All Prompts <span class="count" id="count-all">20</span>
     </div>
-    <div class="tabs" id="tabs">
-        <button class="tab active" data-category="all">All</button>
-        <button class="tab" data-category="Coding">Coding</button>
-        <button class="tab" data-category="Blog Writing">Blog Writing</button>
-        <button class="tab" data-category="Content Writing">Content Writing</button>
+    <div class="sidebar-item" onclick="filterCategory('favorite', this)">
+      <span class="icon">&#9733;</span> Favorites <span class="count" id="count-fav">0</span>
     </div>
+
+    <div class="sidebar-section">Categories</div>
+    <div class="sidebar-item" onclick="filterCategory('writing', this)">
+      <span class="icon dot-writing">&#9679;</span> Writing & Content <span class="count" id="count-writing">0</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('coding', this)">
+      <span class="icon dot-coding">&#9679;</span> Coding & Dev <span class="count" id="count-coding">0</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('meta', this)">
+      <span class="icon dot-meta">&#9679;</span> Meta / Prompt Eng <span class="count" id="count-meta">0</span>
+    </div>
+
+    <div class="sidebar-section">Quick Actions</div>
+    <div class="sidebar-item" onclick="openModal()">
+      <span class="icon">&#65291;</span> New Prompt
+    </div>
+    <div class="sidebar-item" onclick="exportLibrary()">
+      <span class="icon">&#8595;</span> Export as Markdown
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="page-header">
+      <h1 id="page-title">All Prompts</h1>
+      <p id="page-desc">Your curated collection of reusable, high-quality prompts</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat">
+        <span class="stat-value" id="stat-total">0</span>
+        <span class="stat-label">Total Prompts</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-writing)" id="stat-writing">0</span>
+        <span class="stat-label">Writing</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-coding)" id="stat-coding">0</span>
+        <span class="stat-label">Coding</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-meta)" id="stat-meta">0</span>
+        <span class="stat-label">Meta</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--yellow)" id="stat-favs">0</span>
+        <span class="stat-label">Favorites</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" placeholder="Search prompts, tags, descriptions..." id="search-input" oninput="renderPrompts()">
+      </div>
+      <button class="add-btn" onclick="openModal()">&#65291; Add Prompt</button>
+    </div>
+
+    <!-- Prompts List -->
+    <div class="prompts-grid" id="prompts-grid"></div>
+
+    <!-- Best Practices -->
+    <div class="best-practices" id="best-practices-section">
+      <h2>Prompt Engineering Best Practices</h2>
+      <div class="bp-grid">
+        <div class="bp-card">
+          <h4>Be Specific with Role & Context</h4>
+          <p>Start with "You are a [role] who [context]". The clearer the persona and situation, the better the output.</p>
+        </div>
+        <div class="bp-card">
+          <h4>Use [Variables] for Reusability</h4>
+          <p>Wrap swappable parts in [brackets]. This turns a one-off prompt into a reusable template you can deploy in seconds.</p>
+        </div>
+        <div class="bp-card">
+          <h4>Show, Don't Just Tell</h4>
+          <p>Include 1-2 examples of desired output. Few-shot examples dramatically improve consistency and quality.</p>
+        </div>
+        <div class="bp-card">
+          <h4>Version & Iterate</h4>
+          <p>Rate each prompt after use (1-10). Refine top performers, retire weak ones. Your library should evolve monthly.</p>
+        </div>
+        <div class="bp-card">
+          <h4>Constrain the Output</h4>
+          <p>Specify format, length, tone, and structure. "Write a 3-paragraph blog intro in a conversational tone" beats "Write about X".</p>
+        </div>
+        <div class="bp-card">
+          <h4>Test Across Models</h4>
+          <p>Tag which AI model works best for each prompt. Claude excels at nuance, GPT at breadth, Gemini at multimodal.</p>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
-<p class="count" id="count"></p>
-<div class="grid" id="grid"></div>
-
-<footer>Prompt Library &mdash; Built for quick access to go-to prompts.</footer>
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">Add New Prompt</h2>
+    <div class="form-group">
+      <label>Prompt Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Blog Post Outline Generator">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="f-category">
+          <option value="writing">Writing & Content</option>
+          <option value="coding">Coding & Dev</option>
+          <option value="meta">Meta / Prompt Eng</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Best Model</label>
+        <select id="f-model">
+          <option value="Claude">Claude</option>
+          <option value="GPT-4o">GPT-4o</option>
+          <option value="Gemini">Gemini</option>
+          <option value="Any">Any</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="f-desc" placeholder="Short description of what this prompt does">
+    </div>
+    <div class="form-group">
+      <label>Prompt Template (use [VARIABLE] for placeholders)</label>
+      <textarea id="f-prompt" placeholder="You are a [ROLE] specializing in [DOMAIN]. Your task is to..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma-separated)</label>
+      <input type="text" id="f-tags" placeholder="e.g. blog, outline, content-strategy">
+    </div>
+    <div class="form-group">
+      <label>Notes / Tips</label>
+      <input type="text" id="f-notes" placeholder="Optional: when to use, what to watch for">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Rating (1-10)</label>
+        <input type="number" id="f-rating" min="1" max="10" value="7">
+      </div>
+      <div class="form-group">
+        <label>Version</label>
+        <input type="text" id="f-version" value="1.0">
+      </div>
+    </div>
+    <input type="hidden" id="f-edit-index" value="-1">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePrompt()">Save Prompt</button>
+    </div>
+  </div>
+</div>
 
 <script>
-// ============================================================
-//  PROMPT DATA — Edit this array to add / remove prompts
-// ============================================================
-const prompts = [
-  // ── Coding ────────────────────────────────────────────────
+// ── Seed Data ──
+const seedPrompts = [
+  // ─── WRITING & CONTENT ───
   {
-    title: "Code Review / Bug Finder",
-    category: "Coding",
-    tags: ["review", "bugs", "quality"],
-    prompt: `Review the following code for bugs, anti-patterns, and potential improvements. For each issue found, explain:
-1. What the problem is
-2. Why it matters
-3. A suggested fix with code
+    name: "Blog Post Outline Generator",
+    category: "writing",
+    description: "Creates a structured outline for blog posts with SEO-friendly headings and key talking points.",
+    prompt: `You are a senior content strategist with expertise in [NICHE/INDUSTRY].
 
-Code to review:
-\`\`\`
-[paste code here]
-\`\`\``
+Create a comprehensive blog post outline for the topic: "[TOPIC]"
+
+Target audience: [AUDIENCE]
+Target word count: [WORD_COUNT]
+Primary keyword: [KEYWORD]
+
+Requirements:
+- Write a compelling H1 title (include primary keyword)
+- Create 5-8 H2 sections with 2-3 H3 subsections each
+- Include a hook intro paragraph concept
+- Add key talking points under each section
+- Suggest 1 data point or example per section
+- End with a strong CTA section
+- Include meta description suggestion (under 160 chars)
+
+Format the outline with clear hierarchy and brief notes for each section.`,
+    tags: ["blog", "outline", "SEO", "content-strategy"],
+    model: "Claude",
+    rating: 9,
+    version: "2.1",
+    favorite: true,
+    notes: "Works best when you provide a specific niche. Iterate on the H2s — they become your structure.",
+    uses: 24,
+    created: "2025-01-15"
   },
   {
-    title: "Explain Code Like I'm a Beginner",
-    category: "Coding",
-    tags: ["learning", "explanation", "beginner"],
-    prompt: `Explain the following code in simple, beginner-friendly language. Break it down line by line. Avoid jargon — if you must use a technical term, define it. Use analogies where helpful.
+    name: "Email Rewriter — Tone Shifting",
+    category: "writing",
+    description: "Rewrites an email draft in a specified tone while preserving the core message.",
+    prompt: `Rewrite the following email in a [TONE] tone.
+
+Tone options: professional, friendly-casual, assertive, empathetic, concise-executive
+
+Original email:
+"""
+[PASTE_EMAIL_HERE]
+"""
+
+Rules:
+- Preserve ALL key information and requests
+- Adjust formality, word choice, and sentence structure to match the tone
+- Keep it under [MAX_SENTENCES] sentences
+- If the tone is "concise-executive", cut to 3-5 sentences max
+- Suggest a subject line that matches the tone`,
+    tags: ["email", "rewriting", "tone", "communication"],
+    model: "Claude",
+    rating: 8,
+    version: "1.3",
+    favorite: false,
+    notes: "Great for adjusting client emails. The 'concise-executive' option is a lifesaver for long-winded drafts.",
+    uses: 18,
+    created: "2025-01-20"
+  },
+  {
+    name: "Technical Writing Simplifier",
+    category: "writing",
+    description: "Takes complex technical content and rewrites it for a non-technical audience.",
+    prompt: `You are a technical writer who specializes in making complex concepts accessible.
+
+Rewrite the following technical content for [AUDIENCE_LEVEL]:
+- "beginner" = no jargon, use analogies, assume zero background
+- "intermediate" = some jargon okay, assume basic familiarity
+- "executive" = high-level, focus on business impact, no implementation details
+
+Technical content:
+"""
+[TECHNICAL_CONTENT]
+"""
+
+Guidelines:
+- Replace jargon with plain language (or define it in parentheses)
+- Use 1-2 real-world analogies
+- Keep paragraphs to 3 sentences max
+- Add a TL;DR at the top (2 sentences)
+- Highlight key takeaways at the end`,
+    tags: ["technical-writing", "simplification", "docs"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "The 'executive' level is perfect for stakeholder updates. Claude handles nuance here better than GPT.",
+    uses: 12,
+    created: "2025-02-01"
+  },
+  {
+    name: "Social Media Thread Creator",
+    category: "writing",
+    description: "Turns a topic or article into a viral-worthy social media thread with hooks and engagement tactics.",
+    prompt: `Create a [PLATFORM] thread/post series about: "[TOPIC]"
+
+Platform: [Twitter/LinkedIn/Threads]
+Thread length: [NUMBER] posts
+Voice: [VOICE_DESCRIPTION]
+
+Structure each post:
+1. HOOK POST: Open with a bold claim, contrarian take, or surprising stat
+2. BODY POSTS: One clear idea per post, use line breaks for readability
+3. Each post should end with a micro-hook leading to the next
+4. FINAL POST: Strong CTA (follow, share, comment prompt, or link)
+
+Rules:
+- No hashtags in the body (only last post if needed)
+- Use concrete numbers and examples over vague claims
+- Write at a 6th-grade reading level
+- Each post: max 280 chars for Twitter, 3000 for LinkedIn`,
+    tags: ["social-media", "threads", "twitter", "linkedin", "engagement"],
+    model: "Any",
+    rating: 7,
+    version: "1.2",
+    favorite: false,
+    notes: "Swap VOICE_DESCRIPTION with something specific like 'snarky startup founder' or 'thoughtful researcher'.",
+    uses: 9,
+    created: "2025-01-25"
+  },
+  {
+    name: "Storytelling Framework — Hero's Journey",
+    category: "writing",
+    description: "Structures any content using the Hero's Journey narrative framework for maximum engagement.",
+    prompt: `You are a narrative strategist. Transform the following content/idea into a compelling story using the Hero's Journey framework.
+
+Content/Idea: "[CONTENT]"
+Format: [blog post / presentation / case study / video script]
+Length: [SHORT/MEDIUM/LONG]
+
+Map to these beats:
+1. THE ORDINARY WORLD — Set the scene. What was life like before?
+2. THE CALL — What problem or opportunity appeared?
+3. THE RESISTANCE — Why was it hard? What obstacles existed?
+4. THE MENTOR/TOOL — What insight, person, or solution appeared?
+5. THE TRANSFORMATION — What changed? Show the journey.
+6. THE RETURN — What's the new reality? What was learned?
+
+Write it in [FIRST_PERSON/THIRD_PERSON] and make it feel authentic, not formulaic.`,
+    tags: ["storytelling", "framework", "narrative", "content"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "Excellent for case studies and 'About Us' pages. The framework works for any story-driven content.",
+    uses: 6,
+    created: "2025-02-03"
+  },
+
+  // ─── CODING & DEV ───
+  {
+    name: "Code Review — Senior Dev Perspective",
+    category: "coding",
+    description: "Performs a thorough code review like a senior developer, catching bugs, suggesting improvements, and explaining why.",
+    prompt: `You are a senior software engineer conducting a code review. You are thorough but kind — you explain the "why" behind every suggestion.
+
+Review the following [LANGUAGE] code:
+
+\`\`\`[LANGUAGE]
+[PASTE_CODE_HERE]
+\`\`\`
+
+Analyze for:
+1. **Bugs & Logic Errors** — Anything that will break or produce wrong results
+2. **Security Issues** — SQL injection, XSS, auth holes, data exposure
+3. **Performance** — N+1 queries, unnecessary loops, memory leaks
+4. **Readability** — Naming, structure, comments, code organization
+5. **Architecture** — Design patterns, separation of concerns, SOLID principles
+6. **What's Good** — Call out well-written parts (important for morale!)
+
+For each issue:
+- Quote the specific line(s)
+- Explain the problem in plain language
+- Provide the corrected code
+- Rate severity: critical / suggestion / nitpick`,
+    tags: ["code-review", "debugging", "best-practices", "quality"],
+    model: "Claude",
+    rating: 10,
+    version: "2.0",
+    favorite: true,
+    notes: "This is a workhorse prompt. Use it before every PR. The severity ratings help prioritize fixes.",
+    uses: 45,
+    created: "2025-01-10"
+  },
+  {
+    name: "Debug Detective",
+    category: "coding",
+    description: "Systematically diagnoses bugs by walking through the code step-by-step like a detective.",
+    prompt: `You are a debugging expert. I have a bug and need your help finding the root cause.
+
+**Language/Framework**: [LANGUAGE/FRAMEWORK]
+**What should happen**: [EXPECTED_BEHAVIOR]
+**What actually happens**: [ACTUAL_BEHAVIOR]
+**Error message (if any)**: [ERROR]
 
 Code:
 \`\`\`
-[paste code here]
-\`\`\``
-  },
-  {
-    title: "Write Unit Tests",
-    category: "Coding",
-    tags: ["testing", "unit tests", "TDD"],
-    prompt: `Write comprehensive unit tests for the following function/module. Include:
-- Happy path tests
-- Edge cases (empty inputs, nulls, boundary values)
-- Error / exception cases
-Use [testing framework, e.g. Jest / pytest / JUnit]. Add brief comments explaining what each test verifies.
-
-Code to test:
-\`\`\`
-[paste code here]
-\`\`\``
-  },
-  {
-    title: "Refactor for Clean Code",
-    category: "Coding",
-    tags: ["refactor", "clean code", "best practices"],
-    prompt: `Refactor the following code to improve readability, maintainability, and adherence to clean-code principles. Specifically:
-- Use meaningful variable/function names
-- Reduce nesting and complexity
-- Extract reusable logic into functions
-- Remove duplication
-Show the refactored code and briefly explain each change.
-
-Code:
-\`\`\`
-[paste code here]
-\`\`\``
-  },
-  {
-    title: "API Endpoint Generator",
-    category: "Coding",
-    tags: ["API", "REST", "backend"],
-    prompt: `Generate a RESTful API endpoint with the following details:
-- Resource: [resource name, e.g. "users"]
-- Framework: [e.g. Express.js / FastAPI / Spring Boot]
-- Operations: [e.g. CRUD / read-only]
-- Authentication: [e.g. JWT / API key / none]
-
-Include request/response examples, input validation, and error handling. Add brief inline comments.`
-  },
-  {
-    title: "Debug Error Message",
-    category: "Coding",
-    tags: ["debugging", "errors", "troubleshooting"],
-    prompt: `I'm getting the following error. Help me debug it step by step.
-
-Error message:
-\`\`\`
-[paste error here]
+[PASTE_CODE_HERE]
 \`\`\`
 
-Relevant code:
+Debug systematically:
+1. First, restate the problem in your own words to confirm understanding
+2. List 3-5 most likely root causes, ranked by probability
+3. For each candidate, explain the reasoning
+4. Identify the actual root cause with evidence
+5. Provide the fix with before/after code
+6. Explain WHY this fix works
+7. Suggest a test case to verify the fix
+8. Flag any related issues you noticed along the way
+
+Think step by step. Show your reasoning.`,
+    tags: ["debugging", "problem-solving", "systematic"],
+    model: "Claude",
+    rating: 9,
+    version: "1.5",
+    favorite: true,
+    notes: "The step-by-step reasoning makes this far more reliable than 'fix my code'. Always include the error message.",
+    uses: 33,
+    created: "2025-01-12"
+  },
+  {
+    name: "API Endpoint Designer",
+    category: "coding",
+    description: "Designs RESTful API endpoints with proper structure, validation, error handling, and documentation.",
+    prompt: `You are a backend architect designing a RESTful API.
+
+Design the API endpoints for: [FEATURE_DESCRIPTION]
+
+Tech stack: [FRAMEWORK] with [DATABASE]
+Auth: [AUTH_METHOD]
+
+For each endpoint provide:
+1. Method + URL path (following REST conventions)
+2. Request headers, params, query strings, body schema
+3. Response schema (success + error cases)
+4. HTTP status codes with explanations
+5. Validation rules for all inputs
+6. Rate limiting recommendation
+7. Example curl request
+8. Example success and error responses as JSON
+
+Also include:
+- Database schema/model for supporting entities
+- Middleware requirements (auth, validation, logging)
+- Edge cases to handle
+- Pagination strategy if listing endpoints exist
+
+Follow OpenAPI 3.0 conventions.`,
+    tags: ["API", "REST", "backend", "architecture", "design"],
+    model: "Claude",
+    rating: 8,
+    version: "1.1",
+    favorite: false,
+    notes: "Great starting point before coding. Paste the output into your docs and iterate from there.",
+    uses: 11,
+    created: "2025-01-28"
+  },
+  {
+    name: "Refactor with Explanation",
+    category: "coding",
+    description: "Refactors code while explaining every decision, so you actually learn from the changes.",
+    prompt: `You are a patient senior developer pair-programming with me. Refactor the following code and TEACH me as you go.
+
+\`\`\`[LANGUAGE]
+[PASTE_CODE_HERE]
 \`\`\`
-[paste code here]
+
+Refactoring goals: [GOALS — e.g., "improve readability", "add error handling", "make it more testable", "reduce complexity"]
+
+For each change you make:
+1. Show the BEFORE snippet
+2. Show the AFTER snippet
+3. Explain WHY this change improves the code
+4. Rate the impact: high / medium / low
+
+At the end, provide:
+- The complete refactored code
+- A summary of all changes made
+- Suggested next steps for further improvement
+- Any tests that should be written for the refactored code`,
+    tags: ["refactoring", "learning", "clean-code", "mentoring"],
+    model: "Claude",
+    rating: 9,
+    version: "1.2",
+    favorite: true,
+    notes: "The teaching aspect makes this way better than 'just refactor my code'. Great for leveling up.",
+    uses: 22,
+    created: "2025-01-18"
+  },
+  {
+    name: "Unit Test Generator",
+    category: "coding",
+    description: "Generates comprehensive unit tests with edge cases, mocking, and clear test descriptions.",
+    prompt: `Generate comprehensive unit tests for the following [LANGUAGE] code using [TEST_FRAMEWORK]:
+
+\`\`\`[LANGUAGE]
+[PASTE_CODE_HERE]
 \`\`\`
 
-Environment: [language, framework, OS, versions]
+Requirements:
+- Use describe/it (or equivalent) blocks with clear, readable test names
+- Follow the Arrange-Act-Assert pattern
+- Cover these scenarios:
+  Happy path (expected inputs -> expected outputs)
+  Error cases (invalid inputs, missing data, null/undefined)
+  Edge cases (empty arrays, zero values, max limits, unicode, etc.)
+  Boundary conditions
+- Mock external dependencies with clear mock setup
+- Include at least [MIN_TESTS] test cases
+- Add comments explaining WHY each test matters, not just WHAT it tests
 
-Explain the root cause, then provide a fix.`
-  },
-
-  // ── Blog Writing ──────────────────────────────────────────
-  {
-    title: "Blog Post Outline Generator",
-    category: "Blog Writing",
-    tags: ["outline", "structure", "planning"],
-    prompt: `Create a detailed blog post outline on the topic: "[topic]"
-
-Target audience: [audience]
-Desired length: [e.g. 1500 words]
-
-Include:
-- A compelling working title
-- An engaging introduction hook
-- 5-7 main sections with subpoints
-- Key takeaways / conclusion
-- A call to action`
-  },
-  {
-    title: "SEO-Optimized Blog Intro",
-    category: "Blog Writing",
-    tags: ["SEO", "introduction", "hooks"],
-    prompt: `Write an SEO-optimized introduction (150-200 words) for a blog post about: "[topic]"
-
-Target keyword: "[keyword]"
-
-The intro should:
-- Open with a hook (question, stat, or bold statement)
-- Naturally include the target keyword in the first 100 words
-- Clearly state what the reader will learn
-- Create urgency or curiosity to keep reading`
+Output format:
+1. Test file with all tests
+2. A coverage summary (which paths are tested)
+3. Any untestable code you noticed (and suggestions to make it testable)`,
+    tags: ["testing", "unit-tests", "TDD", "quality"],
+    model: "Any",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "Specify the test framework explicitly (Jest, Pytest, etc.) for best results.",
+    uses: 15,
+    created: "2025-02-01"
   },
   {
-    title: "Blog Conclusion Writer",
-    category: "Blog Writing",
-    tags: ["conclusion", "CTA", "wrap-up"],
-    prompt: `Write a strong conclusion (100-150 words) for a blog post about: "[topic]"
+    name: "Database Schema Designer",
+    category: "coding",
+    description: "Designs normalized database schemas with relationships, indexes, and migration scripts.",
+    prompt: `You are a database architect. Design a database schema for: [APP_DESCRIPTION]
 
-Key points covered in the post:
-1. [point 1]
-2. [point 2]
-3. [point 3]
+Database: [PostgreSQL / MySQL / MongoDB]
 
-The conclusion should:
-- Summarize the main takeaways without repeating verbatim
-- End with a clear call to action
-- Leave the reader with something to think about`
+Requirements:
+- [LIST KEY ENTITIES AND RELATIONSHIPS]
+
+Deliver:
+1. Entity-relationship description (entities, their attributes, relationships)
+2. Complete schema with:
+   - Table/collection definitions
+   - Data types with constraints (NOT NULL, UNIQUE, CHECK, etc.)
+   - Primary and foreign keys
+   - Indexes (with justification for each)
+   - Default values where appropriate
+3. Migration script (CREATE TABLE statements or equivalent)
+4. Seed data script (5-10 realistic sample records per table)
+5. Common query patterns with example SQL
+6. Notes on:
+   - Normalization decisions and trade-offs
+   - Scaling considerations
+   - Potential N+1 query pitfalls`,
+    tags: ["database", "schema", "SQL", "architecture", "design"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "List your entities explicitly for best results. Works great as a starting point before migration files.",
+    uses: 8,
+    created: "2025-02-05"
   },
   {
-    title: "Listicle Generator",
-    category: "Blog Writing",
-    tags: ["listicle", "list post", "engagement"],
-    prompt: `Write a listicle-style blog post: "[number] [topic]"
-Example: "10 Productivity Hacks for Remote Developers"
+    name: "Regex Builder & Explainer",
+    category: "coding",
+    description: "Builds and explains regex patterns step by step, because nobody actually memorizes regex.",
+    prompt: `Build a regular expression for the following requirement:
 
-For each item include:
-- A concise, descriptive heading
-- 2-3 sentences explaining the point
-- A practical tip or example
+**What to match**: [DESCRIPTION_OF_PATTERN]
+**Language**: [LANGUAGE — affects regex flavor]
+**Examples that SHOULD match**:
+- [EXAMPLE_1]
+- [EXAMPLE_2]
+**Examples that should NOT match**:
+- [NON_EXAMPLE_1]
+- [NON_EXAMPLE_2]
 
-Tone: [e.g. casual and conversational / professional / witty]`
+Provide:
+1. The regex pattern
+2. Character-by-character explanation of what each part does
+3. A visual breakdown (group the regex into logical segments)
+4. Test it against all provided examples (show match/no-match)
+5. Common edge cases this pattern might miss
+6. The code snippet to use it in [LANGUAGE] (with named capture groups if applicable)`,
+    tags: ["regex", "patterns", "utility"],
+    model: "Any",
+    rating: 7,
+    version: "1.0",
+    favorite: false,
+    notes: "Always include both match and non-match examples — it dramatically improves accuracy.",
+    uses: 10,
+    created: "2025-01-22"
   },
   {
-    title: "Blog Title Ideas",
-    category: "Blog Writing",
-    tags: ["headlines", "titles", "brainstorm"],
-    prompt: `Generate 10 compelling blog title ideas for the topic: "[topic]"
+    name: "Git Commit Message & PR Description",
+    category: "coding",
+    description: "Generates conventional commit messages and detailed PR descriptions from a diff or summary.",
+    prompt: `Generate a git commit message AND pull request description for the following changes.
 
-Mix these styles:
-- How-to titles
-- Numbered list titles
-- Question-based titles
-- Bold / contrarian statement titles
+**What changed (or paste diff)**:
+[CHANGES_DESCRIPTION]
 
-Each title should be under 70 characters and optimized for click-through. Indicate which 2-3 you think are strongest and why.`
+**Type of change**: [feat / fix / refactor / docs / test / chore / perf]
+
+Commit message format (Conventional Commits):
+<type>(<scope>): <short description>
+
+<body — what and why, not how>
+
+<footer — breaking changes, issue refs>
+
+PR Description format:
+## What
+[1-2 sentence summary]
+
+## Why
+[Context and motivation]
+
+## How
+[Key implementation decisions]
+
+## Testing
+[How this was tested]
+
+## Screenshots
+[If UI changes — note where to add them]
+
+## Checklist
+- [ ] Tests pass
+- [ ] No console errors
+- [ ] Reviewed my own code
+- [ ] Updated documentation`,
+    tags: ["git", "PR", "workflow", "documentation"],
+    model: "Any",
+    rating: 7,
+    version: "1.0",
+    favorite: false,
+    notes: "Paste your actual diff for the most accurate commit messages.",
+    uses: 14,
+    created: "2025-01-30"
   },
 
-  // ── Content Writing ───────────────────────────────────────
+  // ─── META / PROMPT ENGINEERING ───
   {
-    title: "Social Media Post Creator",
-    category: "Content Writing",
-    tags: ["social media", "engagement", "short-form"],
-    prompt: `Create a social media post for [platform: Twitter/LinkedIn/Instagram]:
+    name: "Prompt Improver",
+    category: "meta",
+    description: "Takes a basic prompt and upgrades it using prompt engineering best practices.",
+    prompt: `You are a prompt engineering expert. Improve the following prompt using best practices:
 
-Topic: "[topic]"
-Goal: [e.g. drive engagement / announce a launch / share a tip]
-Tone: [e.g. professional / casual / inspirational]
+Original prompt:
+"""
+[PASTE_ORIGINAL_PROMPT]
+"""
 
-Include:
-- The post text (within platform character limits)
-- 3-5 relevant hashtags
-- A suggested call to action
-Provide 2 variations to A/B test.`
+Apply these improvements:
+1. Add a clear ROLE and CONTEXT at the start
+2. Make instructions specific and unambiguous
+3. Add CONSTRAINTS (format, length, tone, what to avoid)
+4. Insert [VARIABLES] for reusable parts
+5. Add 1-2 few-shot examples if applicable
+6. Include an output format specification
+7. Add a chain-of-thought instruction if reasoning is needed
+
+Provide:
+- The improved prompt (ready to copy-paste)
+- A changelog explaining each improvement and why
+- Rate the original prompt (1-10) and the improved version (1-10)`,
+    tags: ["meta", "prompt-engineering", "improvement", "optimization"],
+    model: "Claude",
+    rating: 10,
+    version: "2.0",
+    favorite: true,
+    notes: "Use this on your own prompts before adding them to the library. It catches things you miss.",
+    uses: 30,
+    created: "2025-01-08"
   },
   {
-    title: "Product Description Writer",
-    category: "Content Writing",
-    tags: ["product", "e-commerce", "copywriting"],
-    prompt: `Write a compelling product description for:
+    name: "System Prompt Builder",
+    category: "meta",
+    description: "Creates a comprehensive system prompt for a custom AI assistant or chatbot persona.",
+    prompt: `Design a system prompt for a custom AI assistant with the following characteristics:
 
-Product: [product name]
-Category: [e.g. SaaS tool / physical product / app]
-Key features:
-1. [feature 1]
-2. [feature 2]
-3. [feature 3]
-Target customer: [audience]
+**Name**: [ASSISTANT_NAME]
+**Purpose**: [WHAT_IT_DOES]
+**Target Users**: [WHO_USES_IT]
+**Personality**: [PERSONALITY_TRAITS — e.g., "friendly but direct, uses analogies, slightly humorous"]
+**Domain Expertise**: [KNOWLEDGE_AREAS]
 
-Write two versions:
-1. Short (50-75 words) — for product cards / ads
-2. Long (150-200 words) — for the product page
+The system prompt should include:
+1. Role definition (who the assistant is)
+2. Core capabilities and boundaries (what it can and can't do)
+3. Communication style guidelines
+4. Response format preferences
+5. Guardrails (topics to avoid, how to handle edge cases)
+6. Example interaction patterns (2-3 short examples)
+7. Error handling instructions (what to do when unsure)
 
-Focus on benefits over features. Use sensory/action language.`
+Keep the system prompt under [MAX_WORDS] words. Make it natural, not robotic.`,
+    tags: ["system-prompt", "chatbot", "persona", "meta"],
+    model: "Claude",
+    rating: 8,
+    version: "1.1",
+    favorite: false,
+    notes: "Great for building custom GPTs, Claude Projects, or any chat-based tool with a specific persona.",
+    uses: 7,
+    created: "2025-02-02"
   },
   {
-    title: "Email Newsletter Draft",
-    category: "Content Writing",
-    tags: ["email", "newsletter", "marketing"],
-    prompt: `Draft an email newsletter with the following details:
+    name: "Prompt A/B Test Designer",
+    category: "meta",
+    description: "Creates two variant prompts from one concept so you can test which performs better.",
+    prompt: `I want to A/B test a prompt. Here's my goal:
 
-Subject line options: (provide 3)
-Topic: "[topic]"
-Audience: [audience]
-Goal: [e.g. inform / promote / nurture]
-Tone: [e.g. friendly / professional / urgent]
+**Task**: [WHAT_THE_PROMPT_SHOULD_DO]
+**Current prompt (if any)**: [CURRENT_PROMPT]
+**What I'm optimizing for**: [METRIC — e.g., "accuracy", "creativity", "conciseness", "user satisfaction"]
+
+Create two meaningfully different prompt variants:
+
+**Variant A — [APPROACH_NAME]**
+[Full prompt using approach A — e.g., more structured/constrained]
+
+**Variant B — [APPROACH_NAME]**
+[Full prompt using approach B — e.g., more open/creative]
+
+For each variant, explain:
+- The strategy behind this approach
+- When this variant would likely outperform the other
+- Potential weaknesses
+
+Then provide:
+- A scoring rubric (3-5 criteria) to evaluate outputs from both variants
+- Suggested test cases (3 inputs to try with each variant)`,
+    tags: ["testing", "optimization", "A/B", "meta"],
+    model: "Any",
+    rating: 7,
+    version: "1.0",
+    favorite: false,
+    notes: "The scoring rubric is key — without it you'll just pick whichever 'feels' better, which isn't reliable.",
+    uses: 4,
+    created: "2025-02-04"
+  },
+  {
+    name: "Chain-of-Thought Prompt Template",
+    category: "meta",
+    description: "A reusable template for building prompts that require multi-step reasoning.",
+    prompt: `You are an expert in [DOMAIN]. I need you to solve the following problem using step-by-step reasoning.
+
+Problem: [PROBLEM_STATEMENT]
+
+Think through this systematically:
+
+Step 1: **Understand** — Restate the problem in your own words. Identify key constraints, inputs, and desired outputs.
+
+Step 2: **Break Down** — Decompose the problem into smaller sub-problems. List them.
+
+Step 3: **Analyze** — For each sub-problem, reason through possible approaches. Consider trade-offs.
+
+Step 4: **Synthesize** — Combine your analysis into a coherent solution.
+
+Step 5: **Verify** — Check your solution against the original requirements. Look for errors or gaps.
+
+Step 6: **Present** — Give your final answer in [FORMAT].
+
+Important: Show your reasoning at each step. If you're uncertain about something, say so and explain why.`,
+    tags: ["chain-of-thought", "reasoning", "template", "meta"],
+    model: "Any",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "This is a meta-template — embed it inside other prompts when they need complex reasoning.",
+    uses: 19,
+    created: "2025-01-14"
+  },
+
+  // ─── MORE WRITING ───
+  {
+    name: "Newsletter Writer",
+    category: "writing",
+    description: "Writes engaging newsletter editions with a consistent voice and structure.",
+    prompt: `Write a newsletter edition for my [NICHE] newsletter called "[NEWSLETTER_NAME]".
+
+Voice: [VOICE — e.g., "witty and insightful like Morning Brew meets Seth Godin"]
+Audience: [AUDIENCE_DESCRIPTION]
+
+Topic for this edition: [TOPIC]
 
 Structure:
-- Attention-grabbing opening line
-- Main content (2-3 short paragraphs)
-- One clear CTA button text
-- P.S. line
+1. **Subject Line** — 3 options (curiosity-driven, benefit-driven, and contrarian)
+2. **Preview Text** — 1 sentence that complements the subject line
+3. **Opening Hook** — 2-3 sentences, personal or surprising
+4. **Main Content** — [WORD_COUNT] words, use subheadings and short paragraphs
+5. **Key Takeaway** — Boxed/highlighted insight
+6. **CTA** — What should the reader do next?
+7. **P.S.** — A personal note, fun fact, or teaser for next edition
 
-Keep it scannable — use short paragraphs and bold key phrases.`
+Formatting: Use short paragraphs (2-3 sentences max). Bold key phrases. No walls of text.`,
+    tags: ["newsletter", "email", "content", "engagement"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "The 3 subject line options are clutch — test them with your email platform's A/B testing.",
+    uses: 5,
+    created: "2025-02-06"
   },
   {
-    title: "Landing Page Copy",
-    category: "Content Writing",
-    tags: ["landing page", "conversion", "copywriting"],
-    prompt: `Write landing page copy for:
+    name: "Documentation Writer — README",
+    category: "coding",
+    description: "Generates a professional, comprehensive README.md for any project.",
+    prompt: `Generate a professional README.md for the following project:
 
-Product/Service: [name]
-Value proposition: [one sentence]
-Target audience: [audience]
-Primary CTA: [e.g. "Start Free Trial" / "Book a Demo"]
+**Project Name**: [PROJECT_NAME]
+**Description**: [BRIEF_DESCRIPTION]
+**Tech Stack**: [TECHNOLOGIES]
+**Target Users**: [WHO_IS_THIS_FOR]
 
-Sections needed:
-1. Hero headline + subheadline
-2. 3 benefit blocks (icon + heading + 1-2 sentences)
-3. Social proof section (placeholder for testimonials)
-4. FAQ (3 common objections, reframed as questions)
-5. Final CTA section with urgency
+Include these sections:
+1. Project title + badge placeholders (build status, version, license)
+2. One-paragraph description with key value proposition
+3. Features list (bullet points)
+4. Quick Start (numbered steps, copy-pasteable commands)
+5. Prerequisites
+6. Installation (with code blocks)
+7. Usage examples (with code blocks)
+8. Project structure (file tree)
+9. Contributing guidelines (brief)
+10. License
+11. Contact/Support
 
-Tone: [e.g. confident and modern / warm and approachable]`
+Write in clear, scannable markdown. Assume the reader has 30 seconds to decide if they care about this project.`,
+    tags: ["documentation", "README", "open-source", "markdown"],
+    model: "Any",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "Fill in the project details thoroughly — the more context, the less you'll need to edit the output.",
+    uses: 9,
+    created: "2025-01-26"
+  },
+
+  // ─── MORE CODING ───
+  {
+    name: "Component Builder — React/TypeScript",
+    category: "coding",
+    description: "Builds a production-ready React component with TypeScript, tests, and Storybook story.",
+    prompt: `Build a production-ready React component.
+
+**Component Name**: [COMPONENT_NAME]
+**Purpose**: [WHAT_IT_DOES]
+**Props**: [LIST_KEY_PROPS]
+**Variants/States**: [e.g., "loading, error, empty, populated"]
+
+Requirements:
+- TypeScript with strict types (no \`any\`)
+- Functional component with hooks
+- Props interface exported separately
+- Default props where sensible
+- Accessible (ARIA labels, keyboard navigation, semantic HTML)
+- Responsive (works on mobile)
+- CSS approach: [Tailwind / CSS Modules / styled-components]
+
+Deliver:
+1. \`[ComponentName].tsx\` — The component
+2. \`[ComponentName].types.ts\` — TypeScript interfaces
+3. \`[ComponentName].test.tsx\` — Unit tests (React Testing Library)
+4. \`[ComponentName].stories.tsx\` — Storybook story with all variants
+5. Usage example with sample data`,
+    tags: ["react", "typescript", "component", "frontend"],
+    model: "Claude",
+    rating: 8,
+    version: "1.1",
+    favorite: false,
+    notes: "Always specify your CSS approach. The Storybook output is a nice bonus for component libraries.",
+    uses: 13,
+    created: "2025-01-19"
   },
   {
-    title: "Content Repurposer",
-    category: "Content Writing",
-    tags: ["repurpose", "multi-format", "efficiency"],
-    prompt: `Repurpose the following content into multiple formats:
+    name: "Error Handler & Recovery Pattern",
+    category: "coding",
+    description: "Designs comprehensive error handling for a specific feature or flow.",
+    prompt: `Design a comprehensive error handling strategy for: [FEATURE/FLOW_DESCRIPTION]
 
-Original content:
-"""
-[paste content here]
-"""
+Tech stack: [STACK]
 
-Create:
-1. A Twitter/X thread (5-8 tweets)
-2. A LinkedIn post (150-200 words)
-3. An Instagram caption with hashtags
-4. 3 pull quotes for graphics
-5. A short email teaser (50 words)
+For each potential failure point, provide:
+1. **What can go wrong** — List all failure modes
+2. **Detection** — How to catch/identify this error
+3. **User-facing message** — What the user sees (friendly, actionable)
+4. **Logging** — What to log (without exposing sensitive data)
+5. **Recovery** — Retry logic, fallbacks, graceful degradation
+6. **Code** — Implementation snippet
 
-Maintain the core message but adapt the tone and length for each platform.`
+Cover these failure categories:
+- Network failures (timeout, DNS, connection refused)
+- API errors (4xx, 5xx, malformed responses)
+- Validation errors (bad input, missing fields)
+- Auth errors (expired token, insufficient permissions)
+- State errors (race conditions, stale data)
+- Third-party service failures
+
+Also provide:
+- A centralized error handler/middleware pattern
+- Error boundary component (if frontend)
+- Monitoring/alerting recommendations`,
+    tags: ["error-handling", "resilience", "architecture", "patterns"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "This one is underrated. Most bugs in production are error handling gaps, not logic errors.",
+    uses: 6,
+    created: "2025-02-03"
+  },
+
+  // ─── MORE META ───
+  {
+    name: "Mega Prompt Architect",
+    category: "meta",
+    description: "Creates a detailed, structured mega-prompt for complex multi-step tasks.",
+    prompt: `I need a comprehensive mega-prompt for the following complex task:
+
+**Task**: [COMPLEX_TASK_DESCRIPTION]
+**Context**: [RELEVANT_BACKGROUND]
+**Constraints**: [LIMITATIONS, REQUIREMENTS]
+**Desired Output**: [WHAT_THE_FINAL_RESULT_SHOULD_LOOK_LIKE]
+
+Build a mega-prompt that includes:
+1. **Role Assignment** — A specific expert persona with relevant credentials
+2. **Context Block** — All background information the AI needs
+3. **Task Breakdown** — Numbered steps with clear instructions for each
+4. **Constraints Block** — What to do and what to avoid
+5. **Output Specification** — Exact format, structure, length
+6. **Quality Checks** — Self-verification steps the AI should perform
+7. **[VARIABLE] Placeholders** — For all parts that change between uses
+8. **Few-Shot Examples** — 1-2 input/output examples
+
+Format the mega-prompt so it's ready to copy-paste. Use XML-style tags for structure if the prompt is over 500 words.`,
+    tags: ["mega-prompt", "complex", "architecture", "meta"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "Use this when you need a prompt for a complex, multi-step task. The XML tags tip is key for long prompts.",
+    uses: 11,
+    created: "2025-01-16"
   }
 ];
 
-// ============================================================
-//  APP LOGIC
-// ============================================================
-const grid = document.getElementById("grid");
-const searchInput = document.getElementById("search");
-const tabsContainer = document.getElementById("tabs");
-const countEl = document.getElementById("count");
+// ── State ──
+let prompts = [];
+let currentFilter = 'all';
 
-let activeCategory = "all";
-
-function badgeClass(category) {
-    if (category === "Coding") return "badge-coding";
-    if (category === "Blog Writing") return "badge-blog";
-    return "badge-content";
+function init() {
+  const stored = localStorage.getItem('prompt-library-v1');
+  if (stored) {
+    try { prompts = JSON.parse(stored); } catch(e) { prompts = [...seedPrompts]; }
+  } else {
+    prompts = [...seedPrompts];
+  }
+  updateCounts();
+  renderPrompts();
 }
 
-function renderCards(list) {
-    if (list.length === 0) {
-        grid.innerHTML = `<div class="empty"><p>No prompts match your search.</p></div>`;
-        countEl.textContent = "0 prompts";
-        return;
+function save() {
+  localStorage.setItem('prompt-library-v1', JSON.stringify(prompts));
+}
+
+function updateCounts() {
+  const writing = prompts.filter(p => p.category === 'writing').length;
+  const coding = prompts.filter(p => p.category === 'coding').length;
+  const meta = prompts.filter(p => p.category === 'meta').length;
+  const favs = prompts.filter(p => p.favorite).length;
+
+  document.getElementById('count-all').textContent = prompts.length;
+  document.getElementById('count-writing').textContent = writing;
+  document.getElementById('count-coding').textContent = coding;
+  document.getElementById('count-meta').textContent = meta;
+  document.getElementById('count-fav').textContent = favs;
+
+  document.getElementById('stat-total').textContent = prompts.length;
+  document.getElementById('stat-writing').textContent = writing;
+  document.getElementById('stat-coding').textContent = coding;
+  document.getElementById('stat-meta').textContent = meta;
+  document.getElementById('stat-favs').textContent = favs;
+}
+
+function filterCategory(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  const titles = {
+    all: 'All Prompts',
+    favorite: 'Favorites',
+    writing: 'Writing & Content',
+    coding: 'Coding & Dev',
+    meta: 'Meta / Prompt Engineering'
+  };
+  document.getElementById('page-title').textContent = titles[cat] || 'All Prompts';
+  renderPrompts();
+}
+
+function getFilteredPrompts() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  return prompts.filter(p => {
+    if (currentFilter === 'favorite' && !p.favorite) return false;
+    if (currentFilter !== 'all' && currentFilter !== 'favorite' && p.category !== currentFilter) return false;
+    if (search) {
+      const haystack = `${p.name} ${p.description} ${p.tags.join(' ')} ${p.prompt}`.toLowerCase();
+      if (!haystack.includes(search)) return false;
     }
+    return true;
+  });
+}
 
-    countEl.textContent = `${list.length} prompt${list.length === 1 ? "" : "s"}`;
+function renderPrompts() {
+  const grid = document.getElementById('prompts-grid');
+  const filtered = getFilteredPrompts();
 
-    grid.innerHTML = list.map((p, i) => `
-        <div class="card" style="animation-delay:${i * 0.04}s">
-            <div class="card-header">
-                <span class="card-title">${escapeHTML(p.title)}</span>
-                <span class="badge ${badgeClass(p.category)}">${escapeHTML(p.category)}</span>
-            </div>
-            <div class="card-prompt">${escapeHTML(p.prompt)}</div>
-            <div class="card-footer">
-                <div class="tags">${p.tags.map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}</div>
-                <button class="copy-btn" data-index="${i}" aria-label="Copy prompt">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <rect x="9" y="9" width="13" height="13" rx="2"/>
-                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                    </svg>
-                    Copy
-                </button>
-            </div>
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">No results</div><p>No prompts found. Try a different search or filter.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((p, i) => {
+    const realIndex = prompts.indexOf(p);
+    const catClass = `cat-${p.category}`;
+    const tagClass = `tag-${p.category}`;
+    const stars = '\u2605'.repeat(Math.round(p.rating / 2)) + '\u2606'.repeat(5 - Math.round(p.rating / 2));
+    const promptHtml = p.prompt.replace(/\[([A-Z_\/]+)\]/g, '<span class="var">[$1]</span>');
+
+    return `
+      <div class="prompt-card ${catClass}" onclick="toggleExpand(this)">
+        <div class="prompt-card-header">
+          <div class="prompt-card-title">${p.name}</div>
+          <div class="prompt-card-meta">
+            <span class="tag ${tagClass}">${p.category}</span>
+            <span class="rating">${stars}</span>
+            <span class="fav-star ${p.favorite ? 'active' : ''}" onclick="event.stopPropagation();toggleFav(${realIndex})">
+              ${p.favorite ? '\u2605' : '\u2606'}
+            </span>
+          </div>
         </div>
-    `).join("");
+        <div class="prompt-card-desc">${p.description}</div>
+        <div class="prompt-card-footer">
+          <span>${p.model}</span>
+          <span>v${p.version}</span>
+          <span>${p.created}</span>
+          <span>${p.uses || 0} uses</span>
+          <span>${p.tags.map(t => '#' + t).join(' ')}</span>
+        </div>
+        <div class="prompt-expanded" id="exp-${realIndex}">
+          <div class="prompt-text">
+            <button class="copy-btn" onclick="event.stopPropagation();copyPrompt(${realIndex})">Copy</button>
+            ${promptHtml}
+          </div>
+          ${p.notes ? `<div class="prompt-notes">${p.notes}</div>` : ''}
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="event.stopPropagation();editPrompt(${realIndex})">Edit</button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;color:var(--red);" onclick="event.stopPropagation();deletePrompt(${realIndex})">Delete</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
-function escapeHTML(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
+function toggleExpand(card) {
+  const exp = card.querySelector('.prompt-expanded');
+  exp.classList.toggle('show');
 }
 
-function filterPrompts() {
-    const query = searchInput.value.toLowerCase().trim();
-    return prompts.filter(p => {
-        const matchesCategory = activeCategory === "all" || p.category === activeCategory;
-        if (!matchesCategory) return false;
-        if (!query) return true;
-        return (
-            p.title.toLowerCase().includes(query) ||
-            p.prompt.toLowerCase().includes(query) ||
-            p.tags.some(t => t.toLowerCase().includes(query))
-        );
+function toggleFav(i) {
+  prompts[i].favorite = !prompts[i].favorite;
+  save();
+  updateCounts();
+  renderPrompts();
+}
+
+function copyPrompt(i) {
+  navigator.clipboard.writeText(prompts[i].prompt);
+  const btns = document.querySelectorAll('.copy-btn');
+  btns.forEach(b => {
+    if (b.closest('.prompt-expanded')?.id === `exp-${i}`) {
+      b.textContent = 'Copied!';
+      setTimeout(() => b.textContent = 'Copy', 1500);
+    }
+  });
+}
+
+function openModal() {
+  document.getElementById('modal-overlay').classList.add('show');
+  document.getElementById('modal-title').textContent = 'Add New Prompt';
+  document.getElementById('f-edit-index').value = -1;
+  clearForm();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+}
+
+function clearForm() {
+  ['f-name','f-desc','f-prompt','f-tags','f-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-category').value = 'writing';
+  document.getElementById('f-model').value = 'Claude';
+  document.getElementById('f-rating').value = 7;
+  document.getElementById('f-version').value = '1.0';
+}
+
+function editPrompt(i) {
+  const p = prompts[i];
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-category').value = p.category;
+  document.getElementById('f-model').value = p.model;
+  document.getElementById('f-desc').value = p.description;
+  document.getElementById('f-prompt').value = p.prompt;
+  document.getElementById('f-tags').value = p.tags.join(', ');
+  document.getElementById('f-notes').value = p.notes || '';
+  document.getElementById('f-rating').value = p.rating;
+  document.getElementById('f-version').value = p.version;
+  document.getElementById('f-edit-index').value = i;
+  document.getElementById('modal-title').textContent = 'Edit Prompt';
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function savePrompt() {
+  const name = document.getElementById('f-name').value.trim();
+  const prompt = document.getElementById('f-prompt').value.trim();
+  if (!name || !prompt) { alert('Name and Prompt are required.'); return; }
+
+  const data = {
+    name,
+    category: document.getElementById('f-category').value,
+    description: document.getElementById('f-desc').value.trim(),
+    prompt,
+    tags: document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+    model: document.getElementById('f-model').value,
+    rating: parseInt(document.getElementById('f-rating').value) || 7,
+    version: document.getElementById('f-version').value || '1.0',
+    notes: document.getElementById('f-notes').value.trim(),
+    favorite: false,
+    uses: 0,
+    created: new Date().toISOString().slice(0, 10)
+  };
+
+  const editIndex = parseInt(document.getElementById('f-edit-index').value);
+  if (editIndex >= 0) {
+    data.favorite = prompts[editIndex].favorite;
+    data.uses = prompts[editIndex].uses;
+    data.created = prompts[editIndex].created;
+    prompts[editIndex] = data;
+  } else {
+    prompts.unshift(data);
+  }
+
+  save();
+  updateCounts();
+  renderPrompts();
+  closeModal();
+}
+
+function deletePrompt(i) {
+  if (confirm(`Delete "${prompts[i].name}"?`)) {
+    prompts.splice(i, 1);
+    save();
+    updateCounts();
+    renderPrompts();
+  }
+}
+
+function exportLibrary() {
+  let md = `# My Prompt Library\n\n`;
+  md += `> Exported on ${new Date().toLocaleDateString()} — ${prompts.length} prompts\n\n---\n\n`;
+
+  const categories = { writing: 'Writing & Content', coding: 'Coding & Dev', meta: 'Meta / Prompt Engineering' };
+
+  Object.entries(categories).forEach(([key, label]) => {
+    const catPrompts = prompts.filter(p => p.category === key);
+    if (catPrompts.length === 0) return;
+
+    md += `## ${label}\n\n`;
+    catPrompts.forEach(p => {
+      md += `### ${p.name} ${p.favorite ? '(Favorite)' : ''}\n\n`;
+      md += `- **Rating**: ${p.rating}/10 | **Model**: ${p.model} | **Version**: ${p.version} | **Uses**: ${p.uses}\n`;
+      md += `- **Tags**: ${p.tags.map(t => '`' + t + '`').join(' ')}\n`;
+      md += `- **Description**: ${p.description}\n`;
+      if (p.notes) md += `- **Notes**: ${p.notes}\n`;
+      md += `\n\`\`\`\n${p.prompt}\n\`\`\`\n\n---\n\n`;
     });
+  });
+
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'prompt-library.md';
+  a.click();
 }
 
-function update() {
-    renderCards(filterPrompts());
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
 }
 
-// Search
-searchInput.addEventListener("input", update);
-
-// Tabs
-tabsContainer.addEventListener("click", (e) => {
-    const tab = e.target.closest(".tab");
-    if (!tab) return;
-    tabsContainer.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    activeCategory = tab.dataset.category;
-    update();
-});
-
-// Copy
-grid.addEventListener("click", (e) => {
-    const btn = e.target.closest(".copy-btn");
-    if (!btn) return;
-    const filtered = filterPrompts();
-    const idx = parseInt(btn.dataset.index, 10);
-    const text = filtered[idx].prompt;
-
-    navigator.clipboard.writeText(text).then(() => {
-        btn.classList.add("copied");
-        btn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-            Copied!`;
-        setTimeout(() => {
-            btn.classList.remove("copied");
-            btn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/>
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-                Copy`;
-        }, 1500);
-    });
-});
-
-// Initial render
-update();
+// Init
+init();
 </script>
 </body>
 </html>
