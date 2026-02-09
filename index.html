@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Library</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f1117;
+            --bg-secondary: #1a1d27;
+            --bg-card: #22253a;
+            --bg-card-hover: #2a2e45;
+            --text-primary: #e8eaf0;
+            --text-secondary: #9ba1b0;
+            --accent: #6c63ff;
+            --accent-hover: #5a52e0;
+            --border: #2e3348;
+            --badge-coding: #3b82f6;
+            --badge-blog: #f59e0b;
+            --badge-content: #10b981;
+            --copy-success: #22c55e;
+            --radius: 12px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 3.5rem 1.5rem 2rem;
+            background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #6c63ff, #48bfe3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Controls */
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        #search {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #search::placeholder {
+            color: var(--text-secondary);
+        }
+
+        #search:focus {
+            border-color: var(--accent);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.5rem 1.15rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .tab:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* Grid */
+        .grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .badge-coding {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--badge-coding);
+        }
+
+        .badge-blog {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--badge-blog);
+        }
+
+        .badge-content {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--badge-content);
+        }
+
+        .card-prompt {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.65;
+            flex: 1;
+            white-space: pre-wrap;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 0.25rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .copy-btn.copied {
+            border-color: var(--copy-success);
+            color: var(--copy-success);
+        }
+
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Empty state */
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty p {
+            font-size: 1.1rem;
+        }
+
+        /* Prompt count */
+        .count {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.3s ease both;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero p {
+                font-size: 0.95rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .controls {
+                padding: 1rem 1rem 0;
+            }
+
+            .count {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <h1>Prompt Library</h1>
+    <p>A curated collection of reusable prompts for coding, blog writing, and content creation.</p>
+</section>
+
+<div class="controls">
+    <div class="search-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+        </svg>
+        <input type="text" id="search" placeholder="Search prompts..." autocomplete="off">
+    </div>
+    <div class="tabs" id="tabs">
+        <button class="tab active" data-category="all">All</button>
+        <button class="tab" data-category="Coding">Coding</button>
+        <button class="tab" data-category="Blog Writing">Blog Writing</button>
+        <button class="tab" data-category="Content Writing">Content Writing</button>
+    </div>
+</div>
+
+<p class="count" id="count"></p>
+<div class="grid" id="grid"></div>
+
+<footer>Prompt Library &mdash; Built for quick access to go-to prompts.</footer>
+
+<script>
+// ============================================================
+//  PROMPT DATA — Edit this array to add / remove prompts
+// ============================================================
+const prompts = [
+  // ── Coding ────────────────────────────────────────────────
+  {
+    title: "Code Review / Bug Finder",
+    category: "Coding",
+    tags: ["review", "bugs", "quality"],
+    prompt: `Review the following code for bugs, anti-patterns, and potential improvements. For each issue found, explain:
+1. What the problem is
+2. Why it matters
+3. A suggested fix with code
+
+Code to review:
+\`\`\`
+[paste code here]
+\`\`\``
+  },
+  {
+    title: "Explain Code Like I'm a Beginner",
+    category: "Coding",
+    tags: ["learning", "explanation", "beginner"],
+    prompt: `Explain the following code in simple, beginner-friendly language. Break it down line by line. Avoid jargon — if you must use a technical term, define it. Use analogies where helpful.
+
+Code:
+\`\`\`
+[paste code here]
+\`\`\``
+  },
+  {
+    title: "Write Unit Tests",
+    category: "Coding",
+    tags: ["testing", "unit tests", "TDD"],
+    prompt: `Write comprehensive unit tests for the following function/module. Include:
+- Happy path tests
+- Edge cases (empty inputs, nulls, boundary values)
+- Error / exception cases
+Use [testing framework, e.g. Jest / pytest / JUnit]. Add brief comments explaining what each test verifies.
+
+Code to test:
+\`\`\`
+[paste code here]
+\`\`\``
+  },
+  {
+    title: "Refactor for Clean Code",
+    category: "Coding",
+    tags: ["refactor", "clean code", "best practices"],
+    prompt: `Refactor the following code to improve readability, maintainability, and adherence to clean-code principles. Specifically:
+- Use meaningful variable/function names
+- Reduce nesting and complexity
+- Extract reusable logic into functions
+- Remove duplication
+Show the refactored code and briefly explain each change.
+
+Code:
+\`\`\`
+[paste code here]
+\`\`\``
+  },
+  {
+    title: "API Endpoint Generator",
+    category: "Coding",
+    tags: ["API", "REST", "backend"],
+    prompt: `Generate a RESTful API endpoint with the following details:
+- Resource: [resource name, e.g. "users"]
+- Framework: [e.g. Express.js / FastAPI / Spring Boot]
+- Operations: [e.g. CRUD / read-only]
+- Authentication: [e.g. JWT / API key / none]
+
+Include request/response examples, input validation, and error handling. Add brief inline comments.`
+  },
+  {
+    title: "Debug Error Message",
+    category: "Coding",
+    tags: ["debugging", "errors", "troubleshooting"],
+    prompt: `I'm getting the following error. Help me debug it step by step.
+
+Error message:
+\`\`\`
+[paste error here]
+\`\`\`
+
+Relevant code:
+\`\`\`
+[paste code here]
+\`\`\`
+
+Environment: [language, framework, OS, versions]
+
+Explain the root cause, then provide a fix.`
+  },
+
+  // ── Blog Writing ──────────────────────────────────────────
+  {
+    title: "Blog Post Outline Generator",
+    category: "Blog Writing",
+    tags: ["outline", "structure", "planning"],
+    prompt: `Create a detailed blog post outline on the topic: "[topic]"
+
+Target audience: [audience]
+Desired length: [e.g. 1500 words]
+
+Include:
+- A compelling working title
+- An engaging introduction hook
+- 5-7 main sections with subpoints
+- Key takeaways / conclusion
+- A call to action`
+  },
+  {
+    title: "SEO-Optimized Blog Intro",
+    category: "Blog Writing",
+    tags: ["SEO", "introduction", "hooks"],
+    prompt: `Write an SEO-optimized introduction (150-200 words) for a blog post about: "[topic]"
+
+Target keyword: "[keyword]"
+
+The intro should:
+- Open with a hook (question, stat, or bold statement)
+- Naturally include the target keyword in the first 100 words
+- Clearly state what the reader will learn
+- Create urgency or curiosity to keep reading`
+  },
+  {
+    title: "Blog Conclusion Writer",
+    category: "Blog Writing",
+    tags: ["conclusion", "CTA", "wrap-up"],
+    prompt: `Write a strong conclusion (100-150 words) for a blog post about: "[topic]"
+
+Key points covered in the post:
+1. [point 1]
+2. [point 2]
+3. [point 3]
+
+The conclusion should:
+- Summarize the main takeaways without repeating verbatim
+- End with a clear call to action
+- Leave the reader with something to think about`
+  },
+  {
+    title: "Listicle Generator",
+    category: "Blog Writing",
+    tags: ["listicle", "list post", "engagement"],
+    prompt: `Write a listicle-style blog post: "[number] [topic]"
+Example: "10 Productivity Hacks for Remote Developers"
+
+For each item include:
+- A concise, descriptive heading
+- 2-3 sentences explaining the point
+- A practical tip or example
+
+Tone: [e.g. casual and conversational / professional / witty]`
+  },
+  {
+    title: "Blog Title Ideas",
+    category: "Blog Writing",
+    tags: ["headlines", "titles", "brainstorm"],
+    prompt: `Generate 10 compelling blog title ideas for the topic: "[topic]"
+
+Mix these styles:
+- How-to titles
+- Numbered list titles
+- Question-based titles
+- Bold / contrarian statement titles
+
+Each title should be under 70 characters and optimized for click-through. Indicate which 2-3 you think are strongest and why.`
+  },
+
+  // ── Content Writing ───────────────────────────────────────
+  {
+    title: "Social Media Post Creator",
+    category: "Content Writing",
+    tags: ["social media", "engagement", "short-form"],
+    prompt: `Create a social media post for [platform: Twitter/LinkedIn/Instagram]:
+
+Topic: "[topic]"
+Goal: [e.g. drive engagement / announce a launch / share a tip]
+Tone: [e.g. professional / casual / inspirational]
+
+Include:
+- The post text (within platform character limits)
+- 3-5 relevant hashtags
+- A suggested call to action
+Provide 2 variations to A/B test.`
+  },
+  {
+    title: "Product Description Writer",
+    category: "Content Writing",
+    tags: ["product", "e-commerce", "copywriting"],
+    prompt: `Write a compelling product description for:
+
+Product: [product name]
+Category: [e.g. SaaS tool / physical product / app]
+Key features:
+1. [feature 1]
+2. [feature 2]
+3. [feature 3]
+Target customer: [audience]
+
+Write two versions:
+1. Short (50-75 words) — for product cards / ads
+2. Long (150-200 words) — for the product page
+
+Focus on benefits over features. Use sensory/action language.`
+  },
+  {
+    title: "Email Newsletter Draft",
+    category: "Content Writing",
+    tags: ["email", "newsletter", "marketing"],
+    prompt: `Draft an email newsletter with the following details:
+
+Subject line options: (provide 3)
+Topic: "[topic]"
+Audience: [audience]
+Goal: [e.g. inform / promote / nurture]
+Tone: [e.g. friendly / professional / urgent]
+
+Structure:
+- Attention-grabbing opening line
+- Main content (2-3 short paragraphs)
+- One clear CTA button text
+- P.S. line
+
+Keep it scannable — use short paragraphs and bold key phrases.`
+  },
+  {
+    title: "Landing Page Copy",
+    category: "Content Writing",
+    tags: ["landing page", "conversion", "copywriting"],
+    prompt: `Write landing page copy for:
+
+Product/Service: [name]
+Value proposition: [one sentence]
+Target audience: [audience]
+Primary CTA: [e.g. "Start Free Trial" / "Book a Demo"]
+
+Sections needed:
+1. Hero headline + subheadline
+2. 3 benefit blocks (icon + heading + 1-2 sentences)
+3. Social proof section (placeholder for testimonials)
+4. FAQ (3 common objections, reframed as questions)
+5. Final CTA section with urgency
+
+Tone: [e.g. confident and modern / warm and approachable]`
+  },
+  {
+    title: "Content Repurposer",
+    category: "Content Writing",
+    tags: ["repurpose", "multi-format", "efficiency"],
+    prompt: `Repurpose the following content into multiple formats:
+
+Original content:
+"""
+[paste content here]
+"""
+
+Create:
+1. A Twitter/X thread (5-8 tweets)
+2. A LinkedIn post (150-200 words)
+3. An Instagram caption with hashtags
+4. 3 pull quotes for graphics
+5. A short email teaser (50 words)
+
+Maintain the core message but adapt the tone and length for each platform.`
+  }
+];
+
+// ============================================================
+//  APP LOGIC
+// ============================================================
+const grid = document.getElementById("grid");
+const searchInput = document.getElementById("search");
+const tabsContainer = document.getElementById("tabs");
+const countEl = document.getElementById("count");
+
+let activeCategory = "all";
+
+function badgeClass(category) {
+    if (category === "Coding") return "badge-coding";
+    if (category === "Blog Writing") return "badge-blog";
+    return "badge-content";
+}
+
+function renderCards(list) {
+    if (list.length === 0) {
+        grid.innerHTML = `<div class="empty"><p>No prompts match your search.</p></div>`;
+        countEl.textContent = "0 prompts";
+        return;
+    }
+
+    countEl.textContent = `${list.length} prompt${list.length === 1 ? "" : "s"}`;
+
+    grid.innerHTML = list.map((p, i) => `
+        <div class="card" style="animation-delay:${i * 0.04}s">
+            <div class="card-header">
+                <span class="card-title">${escapeHTML(p.title)}</span>
+                <span class="badge ${badgeClass(p.category)}">${escapeHTML(p.category)}</span>
+            </div>
+            <div class="card-prompt">${escapeHTML(p.prompt)}</div>
+            <div class="card-footer">
+                <div class="tags">${p.tags.map(t => `<span class="tag">${escapeHTML(t)}</span>`).join("")}</div>
+                <button class="copy-btn" data-index="${i}" aria-label="Copy prompt">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copy
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function filterPrompts() {
+    const query = searchInput.value.toLowerCase().trim();
+    return prompts.filter(p => {
+        const matchesCategory = activeCategory === "all" || p.category === activeCategory;
+        if (!matchesCategory) return false;
+        if (!query) return true;
+        return (
+            p.title.toLowerCase().includes(query) ||
+            p.prompt.toLowerCase().includes(query) ||
+            p.tags.some(t => t.toLowerCase().includes(query))
+        );
+    });
+}
+
+function update() {
+    renderCards(filterPrompts());
+}
+
+// Search
+searchInput.addEventListener("input", update);
+
+// Tabs
+tabsContainer.addEventListener("click", (e) => {
+    const tab = e.target.closest(".tab");
+    if (!tab) return;
+    tabsContainer.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    activeCategory = tab.dataset.category;
+    update();
+});
+
+// Copy
+grid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".copy-btn");
+    if (!btn) return;
+    const filtered = filterPrompts();
+    const idx = parseInt(btn.dataset.index, 10);
+    const text = filtered[idx].prompt;
+
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add("copied");
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            Copied!`;
+        setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+                Copy`;
+        }, 1500);
+    });
+});
+
+// Initial render
+update();
+</script>
+</body>
+</html>
