@@ -23,6 +23,8 @@
     --accent-coding-bg: rgba(80,200,240,0.08);
     --accent-meta: #b080f0;
     --accent-meta-bg: rgba(176,128,240,0.08);
+    --accent-claude: #e8673c;
+    --accent-claude-bg: rgba(232,103,60,0.08);
     --green: #50d080;
     --red: #f06060;
     --yellow: #f0d050;
@@ -120,6 +122,7 @@
   .dot-writing { color: var(--accent-writing); }
   .dot-coding { color: var(--accent-coding); }
   .dot-meta { color: var(--accent-meta); }
+  .dot-claude { color: var(--accent-claude); }
 
   /* ── Main ── */
   .main {
@@ -204,6 +207,7 @@
   .filter-btn.active { border-color: var(--accent-writing); color: var(--accent-writing); background: var(--accent-writing-bg); }
   .filter-btn.active-code { border-color: var(--accent-coding); color: var(--accent-coding); background: var(--accent-coding-bg); }
   .filter-btn.active-meta { border-color: var(--accent-meta); color: var(--accent-meta); background: var(--accent-meta-bg); }
+  .filter-btn.active-claude { border-color: var(--accent-claude); color: var(--accent-claude); background: var(--accent-claude-bg); }
 
   .add-btn {
     background: var(--surface-3);
@@ -277,6 +281,7 @@
   .prompt-card.cat-writing::before { background: var(--accent-writing); }
   .prompt-card.cat-coding::before { background: var(--accent-coding); }
   .prompt-card.cat-meta::before { background: var(--accent-meta); }
+  .prompt-card.cat-claude::before { background: var(--accent-claude); }
 
   .prompt-card:hover {
     border-color: var(--border-hover);
@@ -314,6 +319,7 @@
   .tag-writing { background: var(--accent-writing-bg); color: var(--accent-writing); }
   .tag-coding { background: var(--accent-coding-bg); color: var(--accent-coding); }
   .tag-meta { background: var(--accent-meta-bg); color: var(--accent-meta); }
+  .tag-claude { background: var(--accent-claude-bg); color: var(--accent-claude); }
 
   .rating {
     font-family: 'JetBrains Mono', monospace;
@@ -663,6 +669,9 @@
     <div class="sidebar-item" onclick="filterCategory('meta', this)">
       <span class="icon dot-meta">&#9679;</span> Meta / Prompt Eng <span class="count" id="count-meta">0</span>
     </div>
+    <div class="sidebar-item" onclick="filterCategory('claude', this)">
+      <span class="icon dot-claude">&#9679;</span> Claude / API Dev <span class="count" id="count-claude">0</span>
+    </div>
 
     <div class="sidebar-section">Quick Actions</div>
     <div class="sidebar-item" onclick="openModal()">
@@ -697,6 +706,10 @@
       <div class="stat">
         <span class="stat-value" style="color:var(--accent-meta)" id="stat-meta">0</span>
         <span class="stat-label">Meta</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-claude)" id="stat-claude">0</span>
+        <span class="stat-label">Claude API</span>
       </div>
       <div class="stat">
         <span class="stat-value" style="color:var(--yellow)" id="stat-favs">0</span>
@@ -763,6 +776,7 @@
           <option value="writing">Writing & Content</option>
           <option value="coding">Coding & Dev</option>
           <option value="meta">Meta / Prompt Eng</option>
+          <option value="claude">Claude / API Dev</option>
         </select>
       </div>
       <div class="form-group">
@@ -843,18 +857,21 @@ function updateCounts() {
   const writing = prompts.filter(p => p.category === 'writing').length;
   const coding = prompts.filter(p => p.category === 'coding').length;
   const meta = prompts.filter(p => p.category === 'meta').length;
+  const claude = prompts.filter(p => p.category === 'claude').length;
   const favs = prompts.filter(p => p.favorite).length;
 
   document.getElementById('count-all').textContent = prompts.length;
   document.getElementById('count-writing').textContent = writing;
   document.getElementById('count-coding').textContent = coding;
   document.getElementById('count-meta').textContent = meta;
+  document.getElementById('count-claude').textContent = claude;
   document.getElementById('count-fav').textContent = favs;
 
   document.getElementById('stat-total').textContent = prompts.length;
   document.getElementById('stat-writing').textContent = writing;
   document.getElementById('stat-coding').textContent = coding;
   document.getElementById('stat-meta').textContent = meta;
+  document.getElementById('stat-claude').textContent = claude;
   document.getElementById('stat-favs').textContent = favs;
 }
 

@@ -1169,6 +1169,251 @@ Be specific, cite sections of the provided architecture document, and provide ac
   },
 
   // ═══════════════════════════════════════════════════════════
+  //  CLAUDE / API DEV
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    name: "System Prompt Architect",
+    category: "claude",
+    description: "Design a production-ready system prompt for any Claude-powered application with role, constraints, output format, and edge case handling.",
+    prompt: `You are an expert prompt engineer who specializes in building system prompts for production Claude applications.
+
+Design a complete system prompt for the following application:
+
+Application name: [APP_NAME]
+What it does: [APP_DESCRIPTION]
+Target users: [TARGET_USERS]
+Desired tone: [TONE] (e.g. professional, friendly, concise)
+Output format: [OUTPUT_FORMAT] (e.g. markdown, plain text, JSON)
+Key constraints: [CONSTRAINTS] (e.g. no code, no opinions, stay on topic)
+
+Your system prompt must include:
+1. **Role definition** — who Claude is in this app and what it specializes in
+2. **Behavioral rules** — what it should and should not do
+3. **Output format instructions** — exactly how responses should be structured
+4. **Edge case handling** — how to respond to off-topic, ambiguous, or harmful inputs
+5. **Tone and style guidelines** — voice, formality, response length
+
+After writing the system prompt, provide:
+- A brief explanation of each design decision
+- 2-3 example user messages with ideal Claude responses to validate the prompt
+- Any follow-up tuning suggestions`,
+    tags: ["system-prompt", "Claude", "API", "prompt-engineering", "production", "LLM"],
+    model: "Claude",
+    rating: 10,
+    version: "1.0",
+    favorite: true,
+    notes: "Use this before building any Claude-powered app. The example inputs/outputs section is especially useful for validating the prompt before going to production.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Tool Use Schema Designer",
+    category: "claude",
+    description: "Generate well-structured JSON tool definitions for Claude's tool use (function calling) feature.",
+    prompt: `You are an expert in Claude's tool use API. Your job is to design clean, well-typed tool definitions that Claude can reliably use.
+
+I want to add tool use to my Claude integration. Here are the tools I need:
+
+[DESCRIBE_YOUR_TOOLS]
+Example: "A tool to search a product database by name or category, and a tool to add items to a user's cart."
+
+For each tool, generate:
+1. A JSON tool definition following Anthropic's tool use schema:
+\`\`\`json
+{
+  "name": "tool_name",
+  "description": "Clear description of what this tool does and when to use it",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "param_name": {
+        "type": "string",
+        "description": "What this parameter is for"
+      }
+    },
+    "required": ["param_name"]
+  }
+}
+\`\`\`
+
+2. A sample Python or TypeScript function stub that would implement this tool
+
+3. Best practices for this specific tool:
+   - When Claude should call it vs. answer from context
+   - How to handle errors and return them to Claude
+   - Any parameter validation tips
+
+After all tools, provide a complete tools array ready to pass to the Anthropic SDK.`,
+    tags: ["tool-use", "function-calling", "Claude", "API", "JSON-schema", "Anthropic-SDK"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "Claude requires clear, specific tool descriptions to decide when to call them. Vague descriptions lead to under- or over-use. Run this before implementing any tool use integration.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Agentic Workflow Designer",
+    category: "claude",
+    description: "Design a complete multi-step Claude agent — tools, decision logic, memory, and error handling — ready to implement.",
+    prompt: `You are an expert in building agentic systems with Claude. Design a complete agent architecture for the following use case:
+
+Agent goal: [AGENT_GOAL]
+Example: "An agent that researches a topic online, summarizes findings, and drafts a report saved to a file."
+
+Available tools/integrations: [AVAILABLE_TOOLS]
+Example: "web search, file read/write, code execution"
+
+Constraints: [CONSTRAINTS]
+Example: "Must ask for confirmation before writing files. Should stop after 10 steps."
+
+Design the following:
+
+1. **Agent loop architecture** — describe the think → act → observe cycle for this agent
+2. **Tool list** — all tools the agent needs with descriptions and input/output types
+3. **System prompt** — the full system prompt to give Claude for this agent role
+4. **Decision logic** — how the agent decides when to use tools vs. respond directly
+5. **Memory strategy** — what to keep in context, what to summarize, what to discard
+6. **Error handling** — how to handle tool failures, infinite loops, and ambiguous states
+7. **Stopping conditions** — when the agent should stop and return a final answer
+8. **Sample run** — walk through a complete example with 3-5 steps showing the agent reasoning and acting
+
+Output the system prompt and tool definitions in code blocks, ready to copy into an implementation.`,
+    tags: ["agent", "agentic", "Claude", "tool-use", "multi-step", "API", "workflow", "Anthropic"],
+    model: "Claude",
+    rating: 10,
+    version: "1.0",
+    favorite: true,
+    notes: "Best used when designing a new agent from scratch. Fill in the agent goal concisely — the more specific you are, the better the tool list and decision logic will be.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Prompt Cache Optimizer",
+    category: "claude",
+    description: "Restructure your Claude API prompts to maximize prompt caching hits and reduce cost and latency.",
+    prompt: `You are an expert in Claude's prompt caching feature. Help me restructure my prompts to maximize cache hits and reduce API costs.
+
+Here is my current prompt setup:
+
+System prompt:
+\`\`\`
+[PASTE_SYSTEM_PROMPT]
+\`\`\`
+
+Typical user message structure:
+\`\`\`
+[PASTE_EXAMPLE_USER_MESSAGE]
+\`\`\`
+
+My use case: [USE_CASE]
+Example: "Customer support bot that answers questions about a 50-page product manual."
+
+Analyze my current setup and provide:
+
+1. **Cache hit analysis** — which parts of my current prompt are good candidates for caching vs. which change per request
+2. **Restructured prompt** — rewrite the system prompt and message structure with cache_control breakpoints in the right places, following Anthropic's prompt caching API format
+3. **Estimated savings** — rough estimate of token cost reduction based on typical cache hit rates
+4. **Implementation code** — a Python or TypeScript snippet showing exactly how to pass the restructured prompt to the Anthropic SDK with caching enabled
+5. **Caching pitfalls** — any antipatterns in my current setup that would prevent cache hits
+
+Rules to follow:
+- Static content (instructions, documents, examples) goes before dynamic content (user input)
+- cache_control should be set at the last stable breakpoint before dynamic content
+- Minimum cacheable block is 1024 tokens for Claude 3 models`,
+    tags: ["prompt-caching", "cost-optimization", "Claude", "API", "performance", "Anthropic-SDK", "tokens"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Most impactful for apps with large, static system prompts (docs, manuals, long instructions) that repeat across requests. Can reduce costs by 60-90% on cacheable content.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Structured Output Extractor",
+    category: "claude",
+    description: "Get reliable, schema-validated JSON output from Claude using tool use as a forcing function.",
+    prompt: `You are an expert in getting structured, reliable output from Claude. Help me design a prompt that guarantees JSON output matching a specific schema.
+
+What I want to extract: [DESCRIBE_OUTPUT]
+Example: "From a user's job description, extract: job title, required skills (array), salary range, and remote/onsite status."
+
+Input format: [INPUT_FORMAT]
+Example: "Free-text job posting pasted by the user"
+
+My target JSON schema: [SCHEMA_OR_DESCRIBE_IT]
+Example: "{ title: string, skills: string[], salaryMin: number, salaryMax: number, remote: boolean }"
+
+Provide:
+
+1. **Tool-use approach** — define a single extraction tool with a strict JSON schema that forces Claude to output structured data (most reliable method)
+
+2. **Prompt approach** — a fallback system prompt + user message that instructs Claude to output JSON directly, with instructions to handle missing fields gracefully
+
+3. **Validation code** — a short Python or TypeScript snippet to call the API and validate/parse the response, with error handling for malformed output
+
+4. **Edge case handling** — how to handle inputs where some fields can't be determined
+
+5. **Testing prompt** — 3 example inputs that test edge cases (missing data, ambiguous data, irrelevant input)
+
+Always prefer the tool-use approach over raw JSON prompting — it is significantly more reliable and doesn't require output parsing.`,
+    tags: ["structured-output", "JSON", "tool-use", "Claude", "API", "extraction", "schema", "parsing"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Tool use is always more reliable than asking Claude to output JSON directly. Use this pattern any time you need machine-readable output from Claude.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Claude Model & Parameters Selector",
+    category: "claude",
+    description: "Choose the right Claude model, temperature, max_tokens, and other API parameters for your specific use case.",
+    prompt: `You are an expert in the Claude model family and Anthropic's API. Help me select the right model and parameters for my use case.
+
+My use case: [USE_CASE]
+Example: "A real-time coding assistant in a VS Code extension that suggests completions and explains errors."
+
+Requirements:
+- Latency needs: [LATENCY] (e.g. real-time <1s, interactive <3s, batch is fine)
+- Complexity of tasks: [COMPLEXITY] (e.g. simple Q&A, multi-step reasoning, creative writing)
+- Expected input size: [INPUT_SIZE] (e.g. short messages, long documents, entire codebases)
+- Expected output size: [OUTPUT_SIZE] (e.g. one-liners, paragraphs, full documents)
+- Budget sensitivity: [BUDGET] (e.g. cost is critical, moderate, not a concern)
+- Volume: [VOLUME] (e.g. 10 req/day, 1000 req/day, 1M req/month)
+
+Provide:
+1. **Recommended model** — which Claude model (Haiku 4.5, Sonnet 4.5/4.6, Opus 4.6) with justification
+2. **Parameter settings** — recommended temperature, max_tokens, top_p with explanations for each
+3. **Cost estimate** — rough monthly cost at stated volume using current pricing
+4. **Alternative model** — a cheaper or faster alternative with the tradeoffs
+5. **When to upgrade** — signals that indicate you need a more capable model
+6. **SDK snippet** — a ready-to-use Python or TypeScript API call with all recommended parameters set
+
+Current Claude models (April 2026):
+- claude-haiku-4-5: Fastest, cheapest, great for simple tasks
+- claude-sonnet-4-5 / claude-sonnet-4-6: Best balance of speed, capability, cost
+- claude-opus-4-6: Most capable, highest cost, best for complex reasoning`,
+    tags: ["model-selection", "Claude", "API", "parameters", "temperature", "cost", "Haiku", "Sonnet", "Opus"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Run this at the start of any new Claude integration. Getting the model and parameters right upfront saves significant debugging and cost later.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  // ═══════════════════════════════════════════════════════════
   //  SYED'S PROMPTS
   // ═══════════════════════════════════════════════════════════
 
