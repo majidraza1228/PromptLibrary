@@ -1169,7 +1169,7 @@ Be specific, cite sections of the provided architecture document, and provide ac
   },
 
   // ═══════════════════════════════════════════════════════════
-  //  PETER'S PROMPTS (imported from Peter's Personal AI Prompt Library)
+  //  SYED'S PROMPTS
   // ═══════════════════════════════════════════════════════════
 
   {
@@ -1262,7 +1262,7 @@ Include relevant info like customer interviews, competitive research, supporting
     rating: 9,
     version: "1.0",
     favorite: true,
-    notes: "Start by pasting this prompt, then share your rough notes when the AI asks. Works best with messy, unstructured notes — the more context you give, the sharper the output. Based on Peter's Pinterest-style PRD template.",
+    notes: "Start by pasting this prompt, then share your rough notes when the AI asks. Works best with messy, unstructured notes — the more context you give, the sharper the output.",
     uses: 0,
     created: "2026-04-19"
   },
