@@ -919,7 +919,10 @@ function filterCategory(cat, el) {
     favorite: 'Favorites',
     writing: 'Writing & Content',
     coding: 'Coding & Dev',
-    meta: 'Meta / Prompt Engineering'
+    meta: 'Meta / Prompt Engineering',
+    claude: 'Claude / API Dev',
+    workflow: 'Workflow Automation',
+    design: 'UI / UX Design'
   };
   document.getElementById('page-title').textContent = titles[cat] || 'All Prompts';
   renderPrompts();
