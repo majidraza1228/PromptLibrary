@@ -42,12 +42,14 @@ Prompt Library gives you a searchable, categorized collection of reusable prompt
 ```
 PromptLibrary/
 ├── index.html              ← App layout, styles, and all UI logic
-├── prompts.js              ← Seed data for the web app (all 35 prompts as a JS array)
+├── prompts.js              ← Seed data for the web app (all 47 prompts as a JS array)
 ├── prompts/                ← Individual prompt files for developer copy-paste
 │   ├── writing/            ← 10 writing prompts
 │   ├── coding/             ← 13 coding prompts
 │   ├── meta/               ← 6 meta/prompt-engineering prompts
-│   └── claude/             ← 6 Claude API & developer prompts
+│   ├── claude/             ← 6 Claude API & developer prompts
+│   ├── workflow/           ← 6 workflow automation prompts
+│   └── design/             ← 6 UI/UX design prompts
 └── README.md               ← This file
 ```
 

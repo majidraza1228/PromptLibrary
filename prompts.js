@@ -1414,6 +1414,677 @@ Current Claude models (April 2026):
   },
 
   // ═══════════════════════════════════════════════════════════
+  //  WORKFLOW AUTOMATION
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    name: "AI News Digest → Slack",
+    category: "workflow",
+    description: "Curate the latest AI news from provided sources and format a ready-to-post Slack digest.",
+    prompt: `You are an AI news curator and editor. Your job is to turn raw news headlines and links into a clean, engaging Slack digest.
+
+I will paste a list of recent AI news items (headlines, links, or article snippets). Transform them into a Slack-ready digest with this format:
+
+---
+*🤖 AI News Digest — [DATE]*
+
+*Top Stories*
+1. *[Headline]* — [1-2 sentence plain-English summary]. [Link]
+2. *[Headline]* — [1-2 sentence plain-English summary]. [Link]
+3. *[Headline]* — [1-2 sentence plain-English summary]. [Link]
+
+*Quick Hits*
+• [Short 1-line item]. [Link]
+• [Short 1-line item]. [Link]
+
+*Why it matters this week:* [2-3 sentences on the broader theme or trend across today's stories]
+---
+
+Rules:
+- Lead with the 3 most important/impactful stories
+- Use plain English — no jargon, no hype
+- Keep each summary under 40 words
+- Flag any items relevant to developers or product teams with a 🛠️ emoji
+- If a story is about a model release, include the model name in bold
+
+Here are today's news items:
+[PASTE_NEWS_ITEMS]`,
+    tags: ["AI-news", "Slack", "digest", "automation", "newsletter", "workflow"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "Pair this with a daily cron job that scrapes AI news sources (The Verge AI, Ars Technica, X/Twitter lists) and pipes the results into this prompt. Output goes straight to a Slack webhook.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Meeting Notes → Action Items",
+    category: "workflow",
+    description: "Extract clean action items, decisions, and owners from raw meeting notes or transcripts.",
+    prompt: `You are a sharp executive assistant who never misses a follow-up. Extract all action items, decisions, and open questions from the meeting notes below.
+
+Meeting notes:
+"""
+[PASTE_MEETING_NOTES_OR_TRANSCRIPT]
+"""
+
+Output the following sections:
+
+**✅ Action Items**
+| # | Task | Owner | Due Date | Priority |
+|---|------|-------|----------|----------|
+List every concrete next step. If no owner was mentioned, write "Unassigned". If no due date, write "TBD".
+
+**📌 Decisions Made**
+- [Decision 1] — decided by [person/group]
+- [Decision 2] — decided by [person/group]
+
+**❓ Open Questions**
+- [Question] — needs answer from [person/team]
+
+**📋 Summary**
+2-3 sentences summarizing what the meeting was about and the key outcome.
+
+Rules:
+- Be exhaustive on action items — include even small ones like "send the link" or "schedule a follow-up"
+- Use the exact names mentioned in the notes for owners
+- If something was discussed but no decision was made, put it in Open Questions
+- Keep task descriptions action-oriented (start with a verb)`,
+    tags: ["meeting-notes", "action-items", "productivity", "workflow", "automation", "team"],
+    model: "Claude",
+    rating: 10,
+    version: "1.0",
+    favorite: true,
+    notes: "Works with raw transcripts (Otter, Zoom, Google Meet), bullet notes, or stream-of-consciousness scribbles. The table format pastes cleanly into Notion, Linear, or Slack.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Weekly Team Status Report",
+    category: "workflow",
+    description: "Turn scattered team updates into a clean weekly status report ready to share with stakeholders.",
+    prompt: `You are a technical program manager who writes clear, stakeholder-ready status reports. Transform the raw updates below into a polished weekly report.
+
+Team: [TEAM_NAME]
+Week of: [WEEK_DATE]
+Audience: [AUDIENCE] (e.g. engineering leads, executives, cross-functional partners)
+
+Raw updates from the team:
+"""
+[PASTE_RAW_UPDATES]
+"""
+
+Structure the report as follows:
+
+**📊 Week of [DATE] — Status Report**
+
+**Overall Status:** 🟢 On Track / 🟡 At Risk / 🔴 Blocked
+[1 sentence explaining the overall status]
+
+**Highlights (What we shipped)**
+- [Completed item with brief impact]
+- [Completed item with brief impact]
+
+**In Progress**
+- [Item] — [% complete or milestone] — ETA: [date]
+- [Item] — [% complete or milestone] — ETA: [date]
+
+**Blockers & Risks**
+- [Blocker] — needs [what] from [who] by [when]
+
+**Next Week**
+- [Planned item]
+- [Planned item]
+
+**Metrics** (if mentioned in updates)
+| Metric | This Week | Last Week | Trend |
+|--------|-----------|-----------|-------|
+
+Rules:
+- Use the correct status emoji based on blockers and progress
+- Surface blockers prominently — never bury them
+- Keep language crisp and factual, no fluff
+- If a number or metric was mentioned, include it`,
+    tags: ["status-report", "team", "productivity", "workflow", "stakeholders", "communication"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Ask each team member to drop 3-5 bullet updates in a Slack channel, then paste them all here. Takes 30 seconds vs. 30 minutes writing it manually.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Email Triage & Response Drafter",
+    category: "workflow",
+    description: "Categorize a batch of emails by priority and draft concise responses for each one.",
+    prompt: `You are a sharp executive assistant who helps manage a high-volume inbox efficiently.
+
+I will paste a batch of emails. For each email:
+1. Assign a priority: 🔴 Urgent (respond today) / 🟡 Important (respond this week) / 🟢 FYI (no response needed) / 🗑️ Ignore
+2. Write a suggested reply (if needed) — concise, professional, and matching the tone of the original
+
+My context: [YOUR_ROLE_AND_CONTEXT]
+Example: "I'm a product manager at a SaaS startup. I value direct, brief responses."
+
+Emails:
+---
+Email 1:
+From: [SENDER]
+Subject: [SUBJECT]
+Body: [BODY]
+
+Email 2:
+From: [SENDER]
+Subject: [SUBJECT]
+Body: [BODY]
+---
+
+For each email output:
+
+**Email [#]: [Subject]**
+Priority: [emoji + label]
+Reason: [1 sentence why]
+Suggested reply:
+\`\`\`
+[Draft reply here, or "No reply needed"]
+\`\`\`
+
+Rules:
+- Keep replies under 5 sentences unless the email requires more detail
+- Match the sender's formality level
+- For urgent items, flag what would happen if you don't respond today
+- Never write a reply that commits to something not in the original email`,
+    tags: ["email", "inbox", "productivity", "workflow", "automation", "communication", "triage"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Most useful at the start of the day. Paste your unread emails in batches of 5-10. Great for clearing inbox backlog before a busy day.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "GitHub PR Release Notes Generator",
+    category: "workflow",
+    description: "Generate user-facing release notes from a list of PR titles and descriptions.",
+    prompt: `You are a technical writer who turns developer PR descriptions into clean, user-facing release notes.
+
+Product: [PRODUCT_NAME]
+Release version: [VERSION]
+Release date: [DATE]
+Audience: [AUDIENCE] (e.g. developers, end users, internal team)
+
+PR list (paste titles and descriptions):
+"""
+[PASTE_PR_TITLES_AND_DESCRIPTIONS]
+"""
+
+Generate release notes with these sections (only include sections that have relevant PRs):
+
+## 🚀 [Product] v[VERSION] — [Date]
+
+### ✨ New Features
+- **[Feature name]:** [Plain-English description of what users can now do]
+
+### ⚡ Improvements
+- [What got better and why it matters to the user]
+
+### 🐛 Bug Fixes
+- [What was broken, now fixed — from user's perspective]
+
+### ⚠️ Breaking Changes
+- [What changed that requires user action, with migration steps if applicable]
+
+### 🔧 Internal / Developer Changes
+- [Technical changes not visible to end users — keep this brief]
+
+Rules:
+- Write from the user's perspective ("You can now...", "Fixed an issue where...")
+- Skip internal refactors and test changes unless they affect reliability
+- Group related PRs into single bullet points
+- Flag breaking changes prominently — never bury them
+- Keep each bullet under 20 words`,
+    tags: ["release-notes", "GitHub", "changelog", "workflow", "automation", "developer", "documentation"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Run after every sprint or release. Pipe in PR titles from `gh pr list --state merged --limit 20` for the cleanest results.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Daily Standup Summarizer",
+    category: "workflow",
+    description: "Turn scattered team standup messages into a clean, skimmable daily summary.",
+    prompt: `You are a team coordinator who turns messy standup messages into a clean daily digest.
+
+Team: [TEAM_NAME]
+Date: [DATE]
+
+Raw standup updates (paste each person's message as-is):
+"""
+[PASTE_STANDUP_MESSAGES]
+"""
+
+Format the summary as follows:
+
+**🗓️ Daily Standup — [DATE]**
+
+| Person | Yesterday | Today | Blockers |
+|--------|-----------|-------|----------|
+[One row per person. Keep each cell to 1-2 short bullet points max.]
+
+**🚧 Blockers to resolve**
+- [Blocker] — [Person] needs [what] — [suggested owner or next step]
+
+**📣 FYI / Announcements**
+- [Any info the team shared that isn't a task or blocker]
+
+**Team pulse:** [One sentence on overall team status — are people on track, overloaded, blocked?]
+
+Rules:
+- Normalize formatting across team members (some write in paragraphs, some in bullets)
+- Surface blockers even if they were mentioned casually
+- If someone didn't submit an update, note it as "No update"
+- Keep table cells tight — cut filler words`,
+    tags: ["standup", "team", "productivity", "workflow", "daily", "Slack", "summary"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "Great for async teams. Have people drop standup messages in a Slack channel, then paste them all into this prompt. Output can be posted back to the channel automatically.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  // ═══════════════════════════════════════════════════════════
+  //  UI / UX DESIGN
+  // ═══════════════════════════════════════════════════════════
+
+  {
+    name: "UI Component Spec Writer",
+    category: "design",
+    description: "Write a detailed, developer-ready spec for any UI component including states, props, accessibility, and edge cases.",
+    prompt: `You are a senior product designer who writes crystal-clear component specs for engineering handoff.
+
+Write a complete spec for the following UI component:
+
+Component name: [COMPONENT_NAME]
+Example: "Date Range Picker", "Multi-select Dropdown", "Notification Toast"
+
+Where it's used: [CONTEXT]
+Example: "In the dashboard to filter reports by date"
+
+Tech stack (if relevant): [STACK]
+Example: "React + Tailwind, design system: Radix UI"
+
+Produce a complete component spec with:
+
+## [Component Name] — Component Spec
+
+### Overview
+[1-2 sentences describing what this component does and when to use it]
+
+### Visual States
+List every state the component can be in:
+- Default
+- Hover
+- Focus
+- Active / Selected
+- Disabled
+- Loading
+- Empty
+- Error
+- [Any component-specific states]
+
+For each state: describe the visual appearance and any behavioral changes.
+
+### Props / API
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+
+### Interactions & Behavior
+- [Keyboard navigation: Tab, Enter, Escape, Arrow keys]
+- [Mouse interactions]
+- [Touch/mobile behavior]
+- [Animation/transition details]
+
+### Accessibility (WCAG 2.1 AA)
+- ARIA role and attributes required
+- Keyboard navigation requirements
+- Screen reader announcements
+- Color contrast requirements
+
+### Edge Cases
+- [What happens with very long text?]
+- [What if data is loading?]
+- [What if there are 0 items? 1 item? 1000 items?]
+- [Mobile breakpoint behavior]
+
+### Do / Don't
+| Do ✅ | Don't ❌ |
+|-------|---------|`,
+    tags: ["UI", "component", "spec", "design-system", "handoff", "React", "accessibility", "UX"],
+    model: "Claude",
+    rating: 10,
+    version: "1.0",
+    favorite: true,
+    notes: "Use this for every new component before handing off to engineering. The states and edge cases sections prevent 80% of back-and-forth during implementation.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "UX Copy Generator",
+    category: "design",
+    description: "Write all UI copy for a feature — buttons, labels, empty states, error messages, tooltips, and onboarding text.",
+    prompt: `You are a UX writer who crafts clear, conversational copy that helps users succeed.
+
+Feature or screen: [FEATURE_NAME]
+Example: "User onboarding flow", "File upload screen", "Payment confirmation page"
+
+Product context: [PRODUCT_CONTEXT]
+Example: "B2B project management tool for engineering teams"
+
+Tone: [TONE]
+Example: "Professional but warm, like a helpful colleague — not corporate, not overly casual"
+
+Generate the following copy for this feature:
+
+### Headings & Subheadings
+- Page/screen title:
+- Subtitle/description:
+- Section headers (if applicable):
+
+### Buttons & CTAs
+- Primary action:
+- Secondary action:
+- Destructive action (if applicable):
+- Cancel / dismiss:
+
+### Empty States
+- Zero-data state (headline):
+- Zero-data state (supporting text):
+- Zero-data state (CTA):
+
+### Error Messages
+- Validation error (inline):
+- System error (toast/banner):
+- Permissions/access error:
+- Network/timeout error:
+
+### Success Messages
+- Success toast/confirmation:
+- Success page/state headline:
+
+### Tooltips & Helper Text
+- [Key field or action] tooltip:
+- [Key field or action] placeholder text:
+
+### Onboarding / Instructional Text
+- First-time user hint:
+- Feature explanation (1 sentence):
+
+Rules:
+- Lead with the benefit or outcome, not the action
+- Use second person ("you", "your") — never "the user"
+- Keep button labels to 2-3 words max
+- Error messages should tell users what to do next, not just what went wrong
+- Provide 2 variations for the most important copy elements`,
+    tags: ["UX-copy", "copywriting", "UI", "design", "empty-states", "error-messages", "onboarding"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: true,
+    notes: "Run this for every new screen or feature. The 2-variation rule on key copy is useful for A/B testing. Adjust the tone field to match your product voice.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Design Critique & Feedback",
+    category: "design",
+    description: "Get structured, actionable design feedback on any UI — usability, hierarchy, consistency, and accessibility.",
+    prompt: `You are a senior product designer and design critic. Give honest, constructive, specific feedback on the design I describe.
+
+What I'm designing: [DESCRIBE_THE_SCREEN_OR_FLOW]
+Example: "A SaaS dashboard home screen showing KPI cards, a chart, and a recent activity feed"
+
+Target users: [TARGET_USERS]
+Design goals: [GOALS]
+Example: "Users should be able to understand their key metrics at a glance within 5 seconds"
+
+[Paste a description of the design, or describe it in detail. Include layout, hierarchy, colors, components, and any copy.]
+
+[DESIGN_DESCRIPTION]
+
+Evaluate the design across these dimensions:
+
+### 1. First Impression (0-5 seconds)
+- What is the eye drawn to first?
+- Is the primary action or key info immediately obvious?
+- What's working well / what's confusing?
+
+### 2. Visual Hierarchy
+- Is information prioritized correctly for the user's goals?
+- Are there competing focal points?
+- Specific fixes:
+
+### 3. Usability & Clarity
+- Any interactions that might confuse users?
+- Are labels and CTAs clear?
+- Mobile/responsive concerns?
+
+### 4. Consistency
+- Any visual inconsistencies (spacing, type, color, component usage)?
+
+### 5. Accessibility
+- Color contrast issues?
+- Touch target sizes?
+- Any WCAG 2.1 AA concerns?
+
+### 6. Top 3 Priority Fixes
+Rank the most impactful changes in order:
+1. [Critical fix — do this first]
+2. [Important improvement]
+3. [Nice to have]
+
+### What's Working Well
+[Be specific — name what's good so it's preserved in revisions]`,
+    tags: ["design-critique", "UX", "UI", "feedback", "usability", "accessibility", "design-review"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Describe the design in as much detail as possible — layout, spacing, color, copy, component types. The more specific your description, the more specific the feedback. Works best as a first pass before a live design review.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "User Flow Designer",
+    category: "design",
+    description: "Map out a complete user flow for any feature — screens, decision points, edge cases, and error paths.",
+    prompt: `You are a senior UX designer who specializes in mapping clear, complete user flows.
+
+Feature: [FEATURE_NAME]
+Example: "User account deletion", "Checkout flow", "Onboarding for new team member"
+
+User goal: [USER_GOAL]
+Example: "Delete my account and receive confirmation that my data is removed"
+
+Entry point: [ENTRY_POINT]
+Example: "Settings → Account → Delete Account button"
+
+Known constraints: [CONSTRAINTS]
+Example: "User must confirm with password, admin users cannot self-delete"
+
+Map the complete user flow including:
+
+## [Feature] — User Flow
+
+### Happy Path
+Step-by-step flow from entry to success:
+1. [Screen/state] → [User action] → [System response]
+2. [Screen/state] → [User action] → [System response]
+...
+
+### Decision Points
+List every fork in the flow:
+- If [condition] → [path A]
+- If [condition] → [path B]
+
+### Error Paths
+For each potential failure:
+- [Error condition] → [What the user sees] → [Recovery path]
+
+### Edge Cases
+- [Edge case] → [How system handles it]
+- [Edge case] → [How system handles it]
+
+### Exit Points
+- [Where can the user abandon the flow?]
+- [What state is the system in after abandonment?]
+
+### Screen List
+Complete list of screens/states needed to build this flow:
+| Screen | Purpose | Key Elements |
+|--------|---------|--------------|
+
+### Open Design Questions
+- [Question that needs answer before design can proceed]`,
+    tags: ["user-flow", "UX", "design", "wireframe", "product", "planning", "feature-design"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Run this before wireframing any new feature. The error paths and edge cases sections surface scope that's easy to miss in early design. Share the screen list directly with engineering as a scope reference.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Accessibility Audit",
+    category: "design",
+    description: "Audit a screen or component for WCAG 2.1 AA accessibility issues with specific, prioritized fixes.",
+    prompt: `You are an accessibility specialist with deep expertise in WCAG 2.1 AA standards. Audit the design or code I provide and give me specific, prioritized fixes.
+
+What I'm auditing: [DESCRIBE_SCREEN_OR_PASTE_CODE]
+Type: [design description / HTML / React component / all three]
+
+Audit against WCAG 2.1 AA for:
+
+### 1. Perceivable
+- **Color contrast** — text, icons, borders against backgrounds (minimum 4.5:1 for normal text, 3:1 for large text)
+- **Non-color indicators** — is info conveyed by color alone?
+- **Images** — do all meaningful images have alt text?
+- **Video/audio** — captions and transcripts if applicable
+
+### 2. Operable
+- **Keyboard navigation** — can all actions be completed without a mouse?
+- **Focus management** — is focus visible and logical?
+- **Touch targets** — minimum 44×44px on mobile
+- **No keyboard traps** — can users navigate away from any element?
+- **Timing** — any time limits that could affect users?
+
+### 3. Understandable
+- **Labels** — all form inputs have associated labels?
+- **Error identification** — are errors described in text, not just color?
+- **Consistent navigation** — UI patterns consistent across screens?
+
+### 4. Robust
+- **Semantic HTML** — correct use of headings, landmarks, lists, buttons vs. divs?
+- **ARIA** — any missing or incorrect ARIA roles/attributes?
+- **Screen reader testing** — any elements that would be confusing to a screen reader?
+
+### Findings Summary
+| Issue | WCAG Criteria | Severity | Fix |
+|-------|--------------|----------|-----|
+List all issues found, sorted by severity: Critical → Major → Minor
+
+### Top 3 Fixes to Do First
+1. [Most critical fix]
+2.
+3.`,
+    tags: ["accessibility", "WCAG", "a11y", "audit", "design", "UI", "inclusive-design"],
+    model: "Claude",
+    rating: 9,
+    version: "1.0",
+    favorite: false,
+    notes: "Paste either a design description, raw HTML, or a React component. The findings table is formatted to copy directly into a Jira/Linear ticket. Run on every screen before shipping.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  {
+    name: "Design System Token Documenter",
+    category: "design",
+    description: "Document a design system's tokens — colors, typography, spacing, shadows — in a structured, developer-ready format.",
+    prompt: `You are a design systems engineer who documents tokens in a clear, developer-friendly format.
+
+Design system name: [DESIGN_SYSTEM_NAME]
+Tech stack: [STACK] (e.g. Tailwind CSS, CSS variables, Figma tokens, Style Dictionary)
+
+I'll describe or paste my current tokens. Transform them into complete documentation.
+
+My tokens:
+"""
+[PASTE_YOUR_TOKENS_OR_DESCRIBE_YOUR_SYSTEM]
+"""
+
+Produce documentation with these sections:
+
+## [Design System Name] — Token Reference
+
+### Color Tokens
+| Token | Value | Usage | Do / Don't |
+|-------|-------|-------|-----------|
+Include: brand colors, semantic colors (success, warning, error, info), surface colors, text colors, border colors
+
+### Typography Tokens
+| Token | Font | Size | Weight | Line Height | Usage |
+|-------|------|------|--------|-------------|-------|
+Include: heading scales (H1-H6), body, caption, code, label
+
+### Spacing Tokens
+| Token | Value (px/rem) | Common Usage |
+|-------|---------------|--------------|
+Document the spacing scale and how to apply it (padding, margin, gap)
+
+### Border & Radius Tokens
+| Token | Value | Usage |
+|-------|-------|-------|
+
+### Shadow / Elevation Tokens
+| Token | Value | Usage / Elevation Level |
+|-------|-------|------------------------|
+
+### Usage Rules
+- [When to use semantic vs. base color tokens]
+- [Spacing usage guidelines]
+- [Typography pairing recommendations]
+
+### CSS Variable Output
+Generate the complete :root CSS block with all tokens as CSS custom properties, ready to paste into a stylesheet.`,
+    tags: ["design-system", "tokens", "CSS", "Figma", "documentation", "design", "Tailwind"],
+    model: "Claude",
+    rating: 8,
+    version: "1.0",
+    favorite: false,
+    notes: "Works with Figma token exports, Tailwind config files, or hand-described token sets. The CSS variable output block is the most used section — paste it straight into your global stylesheet.",
+    uses: 0,
+    created: "2026-04-19"
+  },
+
+  // ═══════════════════════════════════════════════════════════
   //  SYED'S PROMPTS
   // ═══════════════════════════════════════════════════════════
 

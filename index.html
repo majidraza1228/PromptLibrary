@@ -25,6 +25,10 @@
     --accent-meta-bg: rgba(176,128,240,0.08);
     --accent-claude: #e8673c;
     --accent-claude-bg: rgba(232,103,60,0.08);
+    --accent-workflow: #38c9a0;
+    --accent-workflow-bg: rgba(56,201,160,0.08);
+    --accent-design: #e060a8;
+    --accent-design-bg: rgba(224,96,168,0.08);
     --green: #50d080;
     --red: #f06060;
     --yellow: #f0d050;
@@ -123,6 +127,8 @@
   .dot-coding { color: var(--accent-coding); }
   .dot-meta { color: var(--accent-meta); }
   .dot-claude { color: var(--accent-claude); }
+  .dot-workflow { color: var(--accent-workflow); }
+  .dot-design { color: var(--accent-design); }
 
   /* ── Main ── */
   .main {
@@ -208,6 +214,8 @@
   .filter-btn.active-code { border-color: var(--accent-coding); color: var(--accent-coding); background: var(--accent-coding-bg); }
   .filter-btn.active-meta { border-color: var(--accent-meta); color: var(--accent-meta); background: var(--accent-meta-bg); }
   .filter-btn.active-claude { border-color: var(--accent-claude); color: var(--accent-claude); background: var(--accent-claude-bg); }
+  .filter-btn.active-workflow { border-color: var(--accent-workflow); color: var(--accent-workflow); background: var(--accent-workflow-bg); }
+  .filter-btn.active-design { border-color: var(--accent-design); color: var(--accent-design); background: var(--accent-design-bg); }
 
   .add-btn {
     background: var(--surface-3);
@@ -282,6 +290,8 @@
   .prompt-card.cat-coding::before { background: var(--accent-coding); }
   .prompt-card.cat-meta::before { background: var(--accent-meta); }
   .prompt-card.cat-claude::before { background: var(--accent-claude); }
+  .prompt-card.cat-workflow::before { background: var(--accent-workflow); }
+  .prompt-card.cat-design::before { background: var(--accent-design); }
 
   .prompt-card:hover {
     border-color: var(--border-hover);
@@ -320,6 +330,8 @@
   .tag-coding { background: var(--accent-coding-bg); color: var(--accent-coding); }
   .tag-meta { background: var(--accent-meta-bg); color: var(--accent-meta); }
   .tag-claude { background: var(--accent-claude-bg); color: var(--accent-claude); }
+  .tag-workflow { background: var(--accent-workflow-bg); color: var(--accent-workflow); }
+  .tag-design { background: var(--accent-design-bg); color: var(--accent-design); }
 
   .rating {
     font-family: 'JetBrains Mono', monospace;
@@ -672,6 +684,12 @@
     <div class="sidebar-item" onclick="filterCategory('claude', this)">
       <span class="icon dot-claude">&#9679;</span> Claude / API Dev <span class="count" id="count-claude">0</span>
     </div>
+    <div class="sidebar-item" onclick="filterCategory('workflow', this)">
+      <span class="icon dot-workflow">&#9679;</span> Workflow Automation <span class="count" id="count-workflow">0</span>
+    </div>
+    <div class="sidebar-item" onclick="filterCategory('design', this)">
+      <span class="icon dot-design">&#9679;</span> UI / UX Design <span class="count" id="count-design">0</span>
+    </div>
 
     <div class="sidebar-section">Quick Actions</div>
     <div class="sidebar-item" onclick="openModal()">
@@ -710,6 +728,14 @@
       <div class="stat">
         <span class="stat-value" style="color:var(--accent-claude)" id="stat-claude">0</span>
         <span class="stat-label">Claude API</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-workflow)" id="stat-workflow">0</span>
+        <span class="stat-label">Workflows</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" style="color:var(--accent-design)" id="stat-design">0</span>
+        <span class="stat-label">Design</span>
       </div>
       <div class="stat">
         <span class="stat-value" style="color:var(--yellow)" id="stat-favs">0</span>
@@ -777,6 +803,8 @@
           <option value="coding">Coding & Dev</option>
           <option value="meta">Meta / Prompt Eng</option>
           <option value="claude">Claude / API Dev</option>
+          <option value="workflow">Workflow Automation</option>
+          <option value="design">UI / UX Design</option>
         </select>
       </div>
       <div class="form-group">
@@ -858,6 +886,8 @@ function updateCounts() {
   const coding = prompts.filter(p => p.category === 'coding').length;
   const meta = prompts.filter(p => p.category === 'meta').length;
   const claude = prompts.filter(p => p.category === 'claude').length;
+  const workflow = prompts.filter(p => p.category === 'workflow').length;
+  const design = prompts.filter(p => p.category === 'design').length;
   const favs = prompts.filter(p => p.favorite).length;
 
   document.getElementById('count-all').textContent = prompts.length;
@@ -865,6 +895,8 @@ function updateCounts() {
   document.getElementById('count-coding').textContent = coding;
   document.getElementById('count-meta').textContent = meta;
   document.getElementById('count-claude').textContent = claude;
+  document.getElementById('count-workflow').textContent = workflow;
+  document.getElementById('count-design').textContent = design;
   document.getElementById('count-fav').textContent = favs;
 
   document.getElementById('stat-total').textContent = prompts.length;
@@ -872,6 +904,8 @@ function updateCounts() {
   document.getElementById('stat-coding').textContent = coding;
   document.getElementById('stat-meta').textContent = meta;
   document.getElementById('stat-claude').textContent = claude;
+  document.getElementById('stat-workflow').textContent = workflow;
+  document.getElementById('stat-design').textContent = design;
   document.getElementById('stat-favs').textContent = favs;
 }
 
